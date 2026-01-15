@@ -44,13 +44,14 @@ export default (app: Application): void => {
 
     app.patch('/admin/deleteUser/:id', authenticateToken, updateUserProfileValidation, authenticateToken, deleteUserController);
 
-    app.get('/admin/getUsers', authenticateToken, getUsersController);
+    app.get('/admin/getUsers', getUsersController);
+    // app.get('/admin/getUsers', authenticateToken, getUsersController);
 
     app.get('/getTeamMembers', getTeamMembers);
 
     //auth routes:
 
-    app.post('/login', authenticateToken, updateUserProfileValidation, loginValidation, checkPermission("projects", "create"), loginController);
+    app.post('/login', updateUserProfileValidation, loginValidation, checkPermission("projects", "create"), loginController);
 
     // project routes
 
