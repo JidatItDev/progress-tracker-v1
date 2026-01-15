@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+     "module": "CommonJS",
+    "target": "ES2020",
+    "esModuleInterop": true
+  },
+  "include": ["./**/*.ts", "./**/*.d.ts"],
+  "exclude": ["node_modules"]
+}

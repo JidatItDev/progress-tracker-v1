@@ -1,0 +1,47 @@
+import { LoginData } from "./user.interface";
+import Users from "../../models/userModel";
+import jwt from "jsonwebtoken";
+import { AppError } from '../../utils/appError';  
+
+
+export class authService {
+  async login(data: LoginData): Promise<any> {
+    const email = data.email?.trim().toLowerCase();
+    const password = String(data.password ?? "");
+
+    const user = await Users.findOne({ email }); 
+    console.log("the user is:", email);
+    console.log("User document:", user); // Log the entire user object
+    
+    if (!user) {
+      throw new AppError("Invalid email or password", 401);
+    }
+
+    console.log("Stored password:", user.password);
+    console.log("Provided password:", password);
+    console.log("Password match:", user.password === password);
+    
+     if (user.status === "N") {
+      throw new AppError("User account is disabled", 401);
+    }
+
+    if (user.password !== password) {
+      throw new AppError("Invalid email or password", 401);
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1d" }
+    );
+
+    const userObj = user.toObject();
+    delete (userObj as any).password;
+
+    return {
+      message: "Login successful",
+      token,
+      user: userObj,
+    };
+  }
+}
