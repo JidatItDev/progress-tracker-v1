@@ -51,7 +51,7 @@ export default (app: Application): void => {
 
     //auth routes:
 
-    app.post('/login', updateUserProfileValidation, loginValidation, checkPermission("projects", "create"), loginController);
+    app.post('/login', updateUserProfileValidation, loginValidation, loginController);
 
     // project routes
 
