@@ -7,6 +7,7 @@ import Users, { IUserPermissions } from "../../models/userModel";
 import { generateRandomPassword } from "../../utils/passwordGenerate";
 import { welcomeUserTemplate } from "../../helpers/passwordMailTemplate";
 import { sendMail } from "../../helpers/mailer";
+import { mergePermissions } from "../../helpers/mergePermissions";
 
 
 
@@ -99,123 +100,124 @@ async createUser(data: userData): Promise<any> {
 }
 
 async updateUser(data: userData): Promise<any> {
-    try {
-      const { id, name, email, role, permissions } = data;
+  try {
+    const { id, name, email, role, permissions } = data;
 
-      console.log("the role is:", role);
-
-      if (!id) {
-        throw new AppError("Bad Request! id is required.", 400);
-      }
-
-      const existingUser = await Users.findById(id);
-      if (!existingUser) {
-        throw new AppError("User not found", 404);
-      }
-
-      // -----------------------------
-      // Update name (optional)
-      // -----------------------------
-      if (name !== undefined) {
-        const cleanName = String(name).trim();
-        if (!cleanName) {
-          throw new AppError("name cannot be empty.", 400);
-        }
-        existingUser.name = cleanName;
-      }
-
-      // -----------------------------
-      // Update email (optional) + uniqueness check
-      // -----------------------------
-      if (email !== undefined) {
-        const cleanEmail = String(email).trim().toLowerCase();
-        if (!cleanEmail) {
-          throw new AppError("email cannot be empty.", 400);
-        }
-
-        // If email changed, ensure no duplicates
-        if (cleanEmail !== String(existingUser.email).toLowerCase()) {
-          const duplicate = await Users.findOne({
-            _id: { $ne: id },
-            email: cleanEmail,
-          }).lean();
-
-          if (duplicate) {
-            throw new AppError("User with this email already exists.", 409);
-          }
-        }
-
-        existingUser.email = cleanEmail;
-      }
-
-      // -----------------------------
-      // Update role (optional)
-      // -----------------------------
-      if (role !== undefined) {
-        const cleanRole = String(role).trim();
-        if (!cleanRole) {
-          throw new AppError("role cannot be empty.", 400);
-        }
-        existingUser.role = cleanRole as any;
-      }
-
-      // -----------------------------
-      // ✅ Update permissions (optional) - from form
-      // -----------------------------
-      if (permissions !== undefined) {
-        existingUser.permissions = permissions as any;
-      }
-
-      const updatedUser = await existingUser.save();
-
-      return {
-        success: true,
-        message: "User updated successfully",
-        user: {
-          id: updatedUser._id,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          role: updatedUser.role,
-          permissions: updatedUser.permissions, // ✅ return permissions
-          status: updatedUser.status,
-        },
-      };
-    } catch (err) {
-      return handleError(err as AppError);
+    if (!id) {
+      throw new AppError("Bad Request! id is required.", 400);
     }
+
+    const existingUser = await Users.findById(id);
+    if (!existingUser) {
+      throw new AppError("User not found", 404);
+    }
+
+    // -----------------------------
+    // Update name (optional)
+    // -----------------------------
+    if (name !== undefined) {
+      const cleanName = String(name).trim();
+      if (!cleanName) {
+        throw new AppError("name cannot be empty.", 400);
+      }
+      existingUser.name = cleanName;
+    }
+
+    // -----------------------------
+    // Update email (optional) + uniqueness check
+    // -----------------------------
+    if (email !== undefined) {
+      const cleanEmail = String(email).trim().toLowerCase();
+      if (!cleanEmail) {
+        throw new AppError("email cannot be empty.", 400);
+      }
+
+      if (cleanEmail !== String(existingUser.email).toLowerCase()) {
+        const duplicate = await Users.findOne({
+          _id: { $ne: id },
+          email: cleanEmail,
+        }).lean();
+
+        if (duplicate) {
+          throw new AppError("User with this email already exists.", 409);
+        }
+      }
+
+      existingUser.email = cleanEmail;
+    }
+
+    // -----------------------------
+    // Update role (optional)
+    // -----------------------------
+    if (role !== undefined) {
+      const cleanRole = String(role).trim();
+      if (!cleanRole) {
+        throw new AppError("role cannot be empty.", 400);
+      }
+      existingUser.role = cleanRole as any;
+    }
+
+    // -----------------------------
+    // ✅ FIX: Secure permission update
+    // -----------------------------
+    if (permissions !== undefined) {
+      existingUser.permissions = mergePermissions(
+        DEFAULT_PERMISSIONS,
+        permissions
+      );
+    }
+
+    const updatedUser = await existingUser.save();
+
+    return {
+      success: true,
+      message: "User updated successfully",
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        permissions: updatedUser.permissions,
+        status: updatedUser.status,
+      },
+    };
+  } catch (err) {
+    return handleError(err as AppError);
+  }
 }
+
 
 async deleteUser(data: { id: string }): Promise<any> {
-    try {
-      const { id } = data;
+  try {
+    const { id } = data;
 
-      const user = await Users.findById(id);
-      console.log("checking user",user)
-      if (!user) {
-        throw new AppError("User not found", 404);
-      }
-
-      if (user.status === "N") {
-        throw new AppError("User is already deleted.", 400);  
-      }
-
-      user.status = "N";  
-      await user.save();  
-
-      return {
-        success: true,
-        message: "User successfully deleted.",
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          status: user.status,
-        },
-      };
-    } catch (err) {
-      return handleError(err as AppError);
+    const user = await Users.findById(id);
+    if (!user) {
+      throw new AppError("User not found", 404);
     }
+
+    if (user.status === "N") {
+      throw new AppError("User is already deleted.", 400);
+    }
+
+    user.status = "N";
+    await user.save();
+
+    return {
+      success: true,
+      message: "User successfully deleted.",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+      },
+    };
+  } catch (err) {
+    return handleError(err as AppError);
+  }
 }
+
 
 async getUsers(
     page: number = 1, 
