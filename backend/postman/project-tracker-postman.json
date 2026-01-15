@@ -47,8 +47,26 @@
 						{
 							"name": "Login",
 							"request": {
-								"method": "GET",
-								"header": []
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"abc@gmail.com\",\r\n  \"password\": \"9cki0n85\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/login",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"login"
+									]
+								}
 							},
 							"response": []
 						},
@@ -75,6 +93,24 @@
 										"admin",
 										"updateUser",
 										"69674fb53cc8000fdca9456c"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{link}}/admin/getUsers",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"getUsers"
 									]
 								}
 							},
