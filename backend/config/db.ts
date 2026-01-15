@@ -6,8 +6,6 @@ dotenv.config();
 
 let db: Db;
 
-// const uri = "mongodb+srv://jidatemailtester_db_user:optipleX360@database.9ebxnkc.mongodb.net/"
-
 export default async function connectDB(): Promise<void> {
   try {
     const uri = process.env.MONGO_URI
