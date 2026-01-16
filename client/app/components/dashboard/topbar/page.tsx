@@ -1,7 +1,8 @@
 "use client";
 
-import { Bell, Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Bell, Moon, Sun, LogOut } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import SearchBar from "../../searchbar/page";
 
 interface User {
@@ -16,85 +17,105 @@ interface TopbarProps {
 
 export default function Topbar({ user }: TopbarProps) {
   const [isDark, setIsDark] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  // Initialize theme once on mount
+  // Initialize theme
   useEffect(() => {
-    const initializeTheme = () => {
-      const stored = localStorage.getItem("theme");
-      if (stored) {
-        return stored === "dark";
-      }
-      if (window.matchMedia) {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches;
-      }
-      return false;
-    };
-
+    const stored = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsDark(initializeTheme());
+    setIsDark(stored ? stored === "dark" : prefersDark);
   }, []);
-  const handleSearch = (value: string) => {
-    console.log("Search submitted:", value);
-  };
-  // Apply theme changes
+
+  // Apply theme
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleLogout = () => {
+    // Clear all user data from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    
+    // Redirect to login page
+    router.push("/login");
+  };
 
   return (
     <header className="h-16 w-full flex items-center px-6">
       <div className="flex items-center justify-end gap-2 flex-1">
-        {/* Search Bar */}
-        <div className="p-6 flex justify-center items-center">
-          <SearchBar onSearch={handleSearch} />
+        <div className="p-6">
+          <SearchBar onSearch={(v) => console.log(v)} />
         </div>
 
-        {/* Action Buttons */}
+        {/* Actions */}
         <div className="flex items-center gap-3">
-          {/* Notifications */}
-          <button
-            className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Notifications"
-          >
-            <Bell size={20} className="text-gray-600 dark:text-gray-300" />
+          <button className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800">
+            <Bell size={20} />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
 
-          {/* Dark Mode Toggle */}
           <button
             onClick={() => setIsDark((s) => !s)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            aria-pressed={isDark}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800"
           >
-            {isDark ? (
-              <Sun size={20} className="text-gray-600 dark:text-gray-300" />
-            ) : (
-              <Moon size={20} className="text-gray-600 dark:text-gray-300" />
-            )}
+            {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
 
         {/* User Profile */}
-        <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-slate-700">
-          <div className="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center text-white font-semibold text-sm">
-            {user.name.charAt(0).toUpperCase()}
-          </div>
+        <div
+          ref={menuRef}
+          className="relative flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-slate-700"
+        >
+          <button
+            onClick={() => setOpenMenu((s) => !s)}
+            className="flex items-center gap-3 focus:outline-none"
+            aria-haspopup="menu"
+            aria-expanded={openMenu}
+          >
+            <div className="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center text-white font-semibold text-sm">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
 
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-black dark:text-gray-100 whitespace-nowrap">
-              {user.name}
-            </span>
-            <span className="text-xs font-light text-gray-500 dark:text-gray-300 whitespace-nowrap">
-              {user.role}
-            </span>
-          </div>
+            <div className="flex flex-col text-left">
+              <span className="text-sm font-semibold">{user.name}</span>
+              <span className="text-xs text-gray-500">{user.role}</span>
+            </div>
+          </button>
+
+          {/* Dropdown */}
+          {openMenu && (
+            <div
+              className="absolute right-0 top-12 w-40 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-gray-200 dark:border-slate-700 z-50"
+              role="menu"
+            >
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-700 text-red-600"
+                role="menuitem"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -1,7 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import InputField from "@/app/components/inputfield/page";
+
+interface User {
+  _id: string;
+  name: string;
+  email?: string;
+}
 
 interface CreateProjectModalProps {
   onClose: () => void;
@@ -16,38 +23,127 @@ const CreateProjectModal = ({ onClose }: CreateProjectModalProps) => {
   const [priority, setPriority] = useState("medium");
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
   const [showMembers, setShowMembers] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [availableMembers, setAvailableMembers] = useState<User[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
-  const availableMembers = [
-    "John Doe",
-    "Jane Smith",
-    "Alex Johnson",
-    "Emily Davis",
-    "Michael Brown",
-  ];
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const fetchUsers = async () => {
+    setIsLoadingUsers(true);
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        setError("Authentication token not found. Please login again.");
+        return;
+      }
 
-    const projectData = {
-      projectTitle,
-      clientName,
-      description,
-      startDate,
-      endDate,
-      priority,
-      teamMembers,
-    };
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getUsers`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    console.log("Project Created:", projectData);
-    setProjectTitle("");
-    setClientName("");
-    setDescription("");
-    setStartDate("");
-    setEndDate("");
-    setPriority("medium");
-    setTeamMembers([]);
+      setAvailableMembers(response.data.users || response.data || []);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch users");
+      } else {
+        setError("Failed to fetch users");
+      }
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
 
-    onClose();
+  const handleSubmit = async () => {
+    if (!projectTitle || !clientName || !description) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      // Get userId and token from localStorage
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId") || "6968a5a70e206b2737dd4e0d";
+
+      if (!token) {
+        setError("Authentication token not found. Please login again.");
+        return;
+      }
+
+      const projectData = {
+        userId: userId,
+        projectName: projectTitle,
+        description: description,
+        startDate: startDate,
+        endDate: endDate,
+        priority: priority,
+        teamMembers: teamMembers, // Already contains member IDs
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/createProject`,
+        projectData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Project Created Successfully:", response.data);
+
+      // Reset form
+      setProjectTitle("");
+      setClientName("");
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+      setPriority("medium");
+      setTeamMembers([]);
+
+      // Close modal
+      onClose();
+    } catch (err) {
+      console.error("Error creating project:", err);
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to create project");
+      } else {
+        setError("An unexpected error occurred");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const toggleTeamMember = (memberId: string) => {
+    if (teamMembers.includes(memberId)) {
+      setTeamMembers(teamMembers.filter((id) => id !== memberId));
+    } else {
+      setTeamMembers([...teamMembers, memberId]);
+    }
+  };
+
+  const getSelectedMemberNames = () => {
+    return availableMembers
+      .filter((member) => teamMembers.includes(member._id))
+      .map((member) => member.name)
+      .join(", ");
   };
 
   return (
@@ -67,7 +163,13 @@ const CreateProjectModal = ({ onClose }: CreateProjectModalProps) => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        <div className="space-y-5">
           <InputField
             id="projectTitle"
             label="Project Title*"
@@ -162,51 +264,69 @@ const CreateProjectModal = ({ onClose }: CreateProjectModalProps) => {
               Team Members*
             </label>
 
-            <input
-              type="text"
-              placeholder="Select team members"
-              readOnly
-              value={teamMembers.join(", ")}
-              onClick={() => setShowMembers(!showMembers)}
-              className="rounded-lg border border-black px-3 py-2 text-sm cursor-pointer focus:ring-2 focus:ring-pink-500"
-            />
+            {isLoadingUsers ? (
+              <div className="rounded-lg border border-black px-3 py-2 text-sm text-gray-400">
+                Loading users...
+              </div>
+            ) : (
+              <input
+                type="text"
+                placeholder="Select team members"
+                readOnly
+                value={getSelectedMemberNames()}
+                onClick={() => setShowMembers(!showMembers)}
+                className="rounded-lg border border-black px-3 py-2 text-sm cursor-pointer focus:ring-2 focus:ring-pink-500"
+              />
+            )}
 
-            {/* Dropdown */}
-            {showMembers && (
-              <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white shadow-md max-h-40 overflow-y-auto">
-                {availableMembers.map((member) => (
-                  <div
-                    key={member}
-                    onClick={() => {
-                      if (!teamMembers.includes(member)) {
-                        setTeamMembers([...teamMembers, member]);
-                      }
-                    }}
-                    className="px-3 py-2 text-sm cursor-pointer hover:bg-pink-50"
-                  >
-                    {member}
+            {showMembers && !isLoadingUsers && (
+              <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                {availableMembers.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-gray-500">
+                    No users available
                   </div>
-                ))}
+                ) : (
+                  availableMembers.map((member) => (
+                    <div
+                      key={member._id}
+                      onClick={() => toggleTeamMember(member._id)}
+                      className={`px-3 py-2 text-sm cursor-pointer hover:bg-pink-50 flex items-center gap-2 ${
+                        teamMembers.includes(member._id) ? "bg-pink-100" : ""
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={teamMembers.includes(member._id)}
+                        onChange={() => {}}
+                        className="rounded text-pink-600"
+                      />
+                      <span>{member.name}</span>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 ">
+          <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
               className="rounded-lg px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
-              type="submit"
-              className="rounded-lg bg-pink-600 px-5 py-2 text-sm font-medium text-white hover:bg-pink-700 transition-colors"
+              type="button"
+              onClick={handleSubmit}
+              className="rounded-lg bg-pink-600 px-5 py-2 text-sm font-medium text-white hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
             >
-              Create Project
+              {isSubmitting ? "Creating..." : "Create Project"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
