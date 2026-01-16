@@ -14,7 +14,7 @@ export const checkPermission =
 
     const allowed = user.permissions?.[module]?.[action];
 
-    if (!allowed) {
+    if (allowed !== true) {
       return res.status(403).json({
         message: "You do not have permission to perform this action",
       });

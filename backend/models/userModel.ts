@@ -28,6 +28,8 @@ export interface IUserPermissions {
   overview: IPermissionModuleViewOnly;
   projects: IPermissionModuleCrud;
   milestones: IPermissionModuleCrud;
+  submilestones: IPermissionModuleCrud;
+  delay: IPermissionModuleCrud;
   clients: IPermissionModuleViewCreateUpdate;
   activity: IPermissionModuleViewOnly;
   users: IPermissionModuleViewCreateUpdate;
@@ -50,43 +52,49 @@ export interface IUser extends Document {
 const PermissionsSchema = new Schema<IUserPermissions>(
   {
     overview: {
-      view: { type: Boolean, default: false },
-    },
-
-    projects: {
-      view: { type: Boolean, default: false },
-      create: { type: Boolean, default: false },
-      update: { type: Boolean, default: false }, // ✅
-      delete: { type: Boolean, default: false },
-    },
-
-    milestones: {
-      view: { type: Boolean, default: false },
-      create: { type: Boolean, default: false },
-      update: { type: Boolean, default: false }, // ✅
-      delete: { type: Boolean, default: false },
-    },
-
-    clients: {
-      view: { type: Boolean, default: false },
-      create: { type: Boolean, default: false },
-      update: { type: Boolean, default: false }, // ✅
-    },
-
-    activity: {
-      view: { type: Boolean, default: false },
-    },
-
-    users: {
-      view: { type: Boolean, default: false },
-      create: { type: Boolean, default: false },
-      update: { type: Boolean, default: false }, // ✅
-    },
-
-    admin: {
-      view: { type: Boolean, default: false },
-    },
+    view: { type: Boolean, default: false },
   },
+  projects: {
+    view: Boolean,
+    create: Boolean,
+    update: Boolean,
+    delete: Boolean,
+  },
+  milestones: {
+    view: Boolean,
+    create: Boolean,
+    update: Boolean,
+    delete: Boolean,
+  },
+  submilestones: {
+    view: Boolean,
+    create: Boolean,
+    update: Boolean,
+    delete: Boolean,
+  },
+  delay: {
+    view: Boolean,
+    create: Boolean,
+    update: Boolean,
+    delete: Boolean,
+  },
+  clients: {
+    view: Boolean,
+    create: Boolean,
+    update: Boolean,
+  },
+  activity: {
+    view: Boolean,
+  },
+  users: {
+    view: Boolean,
+    create: Boolean,
+    update: Boolean,
+  },
+  admin: {
+    view: Boolean,
+  },
+},
   { _id: false }
 );
 

@@ -6,32 +6,49 @@ type Response = pkg.Response;
 type NextFunction = pkg.NextFunction;
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { UserRole } from "../models/userModel";
+import Users, { UserRole } from "../models/userModel";
 
 dotenv.config();
 
 
-export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
-  const authHeader = req.header("Authorization"); // "Bearer <token>"
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ status: 401, message: "Access Denied. No Token Provided." });
-    return;
-  }
-
-  const token = authHeader.split(" ")[1];
-
+export const authenticateToken = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: string;
-      name: string;
-      email?: string;
-      role: UserRole;
-      status: "Y" | "N";
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Token missing" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+
+    const userId = decoded.userId || decoded.userId; // ✅ KEY FIX
+
+    if (!userId) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
+
+    const user = await Users.findById(userId)
+      .select("-password")
+      .lean();
+
+    if (!user || user.status === "N") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    req.user = {
+      id: user._id,
+      role: user.role,
+      permissions: user.permissions, 
     };
 
-    (req as any).user = decoded;
     next();
-  } catch (error) {
-    res.status(403).json({ status: 403, message: "Invalid Token" });
+  } catch (err) {
+    return res.status(403).json({ message: "Invalid token" });
   }
 };
