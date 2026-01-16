@@ -24,6 +24,7 @@ export const createProjectController = async (
     const {
       userId,
       projectName,
+      client,
       description,
       startDate,
       endDate,
@@ -34,6 +35,7 @@ export const createProjectController = async (
     const result = await projectServiceInstance.createProject({
       userId,
       projectName,
+      client,
       description,
       startDate,
       endDate,
@@ -73,6 +75,7 @@ export const updateProjectController = async (
     const {
       userId,
       projectName,
+      client,
       description,
       startDate,
       endDate,
@@ -85,6 +88,7 @@ export const updateProjectController = async (
       projectId,
       userId,
       projectName,
+      client,
       description,
       startDate,
       endDate,
@@ -140,7 +144,6 @@ export const deleteProjectController = async (
     next(error);
   }
 };
-
 
 
 export const getProjectsController = async (

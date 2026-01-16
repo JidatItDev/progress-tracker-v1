@@ -10,16 +10,10 @@ export class authService {
     const password = String(data.password ?? "");
 
     const user = await Users.findOne({ email }); 
-    console.log("the user is:", email);
-    console.log("User document:", user); // Log the entire user object
     
     if (!user) {
       throw new AppError("Invalid email or password", 401);
     }
-
-    console.log("Stored password:", user.password);
-    console.log("Provided password:", password);
-    console.log("Password match:", user.password === password);
     
      if (user.status === "N") {
       throw new AppError("User account is disabled", 401);

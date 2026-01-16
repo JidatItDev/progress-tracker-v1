@@ -8,6 +8,7 @@ export interface projectData {
     userId: string;
     projectName: string;
     description: string;
+    client: string;
     startDate: Date;
     endDate: Date;
     priority: string;

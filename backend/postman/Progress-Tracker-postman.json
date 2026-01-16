@@ -1,0 +1,706 @@
+{
+	"info": {
+		"_postman_id": "249133c0-07d4-4916-b016-78d17a9768b0",
+		"name": "Progress-Tracker",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "51284157",
+		"_collection_link": "https://owaisansarcodm-9686685.postman.co/workspace/Owais-Ansar's-Workspace~201e0c28-c4f4-4f84-8e6c-fc3fa7db6616/collection/51284157-249133c0-07d4-4916-b016-78d17a9768b0?action=share&source=collection_link&creator=51284157"
+	},
+	"item": [
+		{
+			"name": "Project-Tracker",
+			"item": [
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Create User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoidGVhbSIsImVtYWlsIjoiYXFlZWw0NjIyQGdtYWlsLmNvbSIsImlhdCI6MTc2ODQ3OTkzMiwiZXhwIjoxNzY4NTY2MzMyfQ._WXCj7_yMVZxJtSGWF7Tdv2QaPL0qBxv4UA_cnuRfjQ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Example Team\",\r\n    \"email\": \"example@team.com\",\r\n    \"role\": \"team\",\r\n    \"permissions\": {\r\n        \"overview\": {\r\n            \"view\": true\r\n        },\r\n        \"projects\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"submilestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"delay\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"milestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"clients\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": false\r\n        },\r\n        \"activity\": {\r\n            \"view\": true\r\n        },\r\n        \"users\": {\r\n            \"view\": true,\r\n            \"create\": false,\r\n            \"update\": false\r\n        },\r\n        \"admin\": {\r\n            \"view\": false\r\n        }\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/createUser",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"createUser"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"aqeel4622@gmail.com\",\r\n  \"password\": \"gQm4Z7ew\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/login",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Example Client\",\r\n    \"email\": \"example@client.com\",\r\n    \"role\": \"admin\",\r\n    \"permissions\": {\r\n        \"overview\": {\r\n            \"view\": true\r\n        },\r\n        \"projects\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"milestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"clients\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": false\r\n        },\r\n        \"activity\": {\r\n            \"view\": true\r\n        },\r\n        \"users\": {\r\n            \"view\": true,\r\n            \"create\": false,\r\n            \"update\": false\r\n        },\r\n        \"admin\": {\r\n            \"view\": false\r\n        }\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/updateUser/6969d863c136b3293d943c4f",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"updateUser",
+										"6969d863c136b3293d943c4f"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Users",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/getUsers?page=2",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"getUsers"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Projects",
+					"item": [
+						{
+							"name": "Create Project",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"69674fb53cc8000fdca9456c\",\r\n  \"projectName\": \"Project Tracker\",\r\n  \"client\": \"ABC Company\",\r\n  \"description\": \"Internal tool\",\r\n  \"startDate\": \"2026-01-10\",\r\n  \"endDate\": \"2026-02-10\",\r\n  \"priority\": \"high\",\r\n  \"teamMembers\": [\"695dfba170b6594604603871\", \"695ceed572386aaa8d8cd95d\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/createProject",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"createProject"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Project",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"695cf01d616d5cd1f9589891\",\r\n  \"projectName\": \"Project Tracker\",\r\n  \"description\": \"External tool\",\r\n  \"startDate\": \"2026-01-10\",\r\n  \"endDate\": \"2026-02-20\",\r\n  \"priority\": \"medium\",\r\n  \"teamMembers\": [\"695dfa1c675b13e9b9489325\", \"695ceed572386aaa8d8cd95d\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/updateProject/696095805c0c4faed49c8613",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"updateProject",
+										"696095805c0c4faed49c8613"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Project",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": \"695dfba170b6594604603871\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/deleteProject/696095805c0c4faed49c8613",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"deleteProject",
+										"696095805c0c4faed49c8613"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Projects",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/getProjects",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"getProjects"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Milestones",
+					"item": [
+						{
+							"name": "Create Milestone",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"projectId\": \"6969eeba7b434f6b4802c240\",\r\n    \"milestoneName\": \"Design Phase\",\r\n    \"description\": \"Complete UI/UX design and approval\",\r\n    \"startDate\": \"2026-01-11\",\r\n    \"endDate\": \"2026-01-15\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/createMilestone",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"createMilestone"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Milestone",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": \"696095805c0c4faed9c8613\",\r\n  \"milestoneName\": \"Implement Phase\",\r\n  \"description\": \"Complete implementation and approval\",\r\n  \"startDate\": \"2026-02-06\",\r\n  \"endDate\": \"2026-02-16\",\r\n  \"milestoneStatus\": \"active\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/updateMilestone/6960cbe46e172f0bda18040e",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"updateMilestone",
+										"6960cbe46e172f0bda18040e"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Milestone",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/deleteMilestone/6960cbe46e172f0bda18040e",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"deleteMilestone",
+										"6960cbe46e172f0bda18040e"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Milestone",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/getMilestones",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"getMilestones"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Submilestones",
+					"item": [
+						{
+							"name": "Create Sub-Milestone",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": \"696095805c0c4faed49c8613\",\r\n  \"milestoneId\": \"6960cbe46e172f0bda18040e\",\r\n  \"submilestoneName\": \"Database Design Phase\",\r\n  \"description\": \"Integrate all third-party Database.\",\r\n  \"startDate\": \"2026-02-08\",\r\n  \"endDate\": \"2026-02-09\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/createSubMilestone",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"createSubMilestone"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Sub-Milestone",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": \"696095805c0c4faed49c8613\",\r\n  \"milestoneId\": \"6960cbe46e172f0bda18040e\",\r\n  \"submilestoneName\": \"Database Design Phase\",\r\n  \"description\": \"Create Database and Implementation.\",\r\n  \"startDate\": \"2026-02-08\",\r\n  \"endDate\": \"2026-02-09\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/updateSubMilestone/69649d814265d1a7cd39c1e6",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"updateSubMilestone",
+										"69649d814265d1a7cd39c1e6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Sub-Milestone",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/deleteSubMilestone/69649d814265d1a7cd39c1e6",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"deleteSubMilestone",
+										"69649d814265d1a7cd39c1e6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Sub-Milestone",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admim/getSubMilestones?projectId=696095805c0c4faed49c8613&milestoneId=6960cbe46e172f0bda18040e",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admim",
+										"getSubMilestones"
+									],
+									"query": [
+										{
+											"key": "projectId",
+											"value": "696095805c0c4faed49c8613"
+										},
+										{
+											"key": "milestoneId",
+											"value": "6960cbe46e172f0bda18040e"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Delays",
+					"item": [
+						{
+							"name": "Create Delay",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": \"696095805c0c4faed49c8613\",\r\n  \"milstoneId\": \"6960cbe46e172f0bda18040e\",\r\n  \"delayReason\": \"Client requested additional changes to the UI flow, causing implementation delays.\",\r\n  \"days\": 5\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/createDelay",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"createDelay"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Delay",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": \"696095805c0c4faed49c8613\",\r\n  \"milstoneId\": \"6960cbe46e172f0bda18040e\",\r\n  \"delayReason\": \"Client requested additional changes to the UI flow.\",\r\n  \"days\": 3\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/updateDelay/6964b57f0198c23f514b4504",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"updateDelay",
+										"6964b57f0198c23f514b4504"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Delay",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/deleteDelay/6964b57f0198c23f514b4504",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"deleteDelay",
+										"6964b57f0198c23f514b4504"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Delay",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{link}}/admin/getDelaysByMilstoneId/6960cbe46e172f0bda18040e",
+									"host": [
+										"{{link}}"
+									],
+									"path": [
+										"admin",
+										"getDelaysByMilstoneId",
+										"6960cbe46e172f0bda18040e"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Dashboards",
+			"item": [
+				{
+					"name": "Get Milestone Progress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{link}}/admin/getProjectProgress/696095805c0c4faed49c8613",
+							"host": [
+								"{{link}}"
+							],
+							"path": [
+								"admin",
+								"getProjectProgress",
+								"696095805c0c4faed49c8613"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

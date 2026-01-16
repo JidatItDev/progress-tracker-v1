@@ -9,6 +9,7 @@ import { createMilestoneController, deleteMilestoneController, getMilestonesCont
 import { createSubMilestoneController, deleteSubMilestoneController, getSubMilestonesController, updateSubMilestoneController } from "../controllers/subsmilestoneControllers/submilestoneController";
 import { createDelayController, deleteDelayController, getDelaysByMilstoneIdController, updateDelayController } from "../controllers/delayControllers/delayController";
 import { getProjectProgressController } from "../controllers/projectDashboardControllers/progressTrackerController";
+import { checkPermission } from "../middlewares/permissionMiddleware";
 const express = pkg;
 type Application = pkg.Application;
 type Request = pkg.Request;
@@ -18,7 +19,7 @@ type Response = pkg.Response;
 export default (app: Application): void => {
 
     //create User routes:
-    app.post('/admin/createUser', updateUserProfileValidation, createUserController);
+    app.post('/admin/createUser', updateUserProfileValidation, authenticateToken, checkPermission("users", "create"), createUserController);
 
     // app.post(
     // "/admin/createUser",
@@ -39,11 +40,12 @@ export default (app: Application): void => {
     );
 
 
-    app.put('/admin/updateUser/:id', updateUserProfileValidation, updateUserController);
+    app.put('/admin/updateUser/:id', updateUserProfileValidation, authenticateToken, checkPermission("users", "update"), updateUserController);
 
-    app.patch('/admin/deleteUser/:id', authenticateToken, updateUserProfileValidation, deleteUserController);
+    app.patch('/admin/deleteUser/:id', authenticateToken, updateUserProfileValidation, authenticateToken, checkPermission("users", "delete"), deleteUserController);
 
-    app.get('/admin/getUsers', getUsersController);
+    app.get('/admin/getUsers', authenticateToken, checkPermission("users", "view"), getUsersController);
+    // app.get('/admin/getUsers', authenticateToken, getUsersController);
 
     app.get('/getTeamMembers', getTeamMembers);
 
@@ -53,42 +55,42 @@ export default (app: Application): void => {
 
     // project routes
 
-    app.post('/admin/createProject', createProjectController);
+    app.post('/admin/createProject', authenticateToken, checkPermission("projects", "create"), createProjectController);
 
-    app.put('/admin/updateProject/:id', updateProjectController);
+    app.put('/admin/updateProject/:id', authenticateToken, checkPermission("projects", "udpate"), updateProjectController);
 
-    app.patch('/admin/deleteProject/:id', deleteProjectController);
+    app.patch('/admin/deleteProject/:id', authenticateToken, checkPermission("projects", "delete"), deleteProjectController);
 
-    app.get('/admin/getProjects', getProjectsController);
+    app.get('/admin/getProjects', authenticateToken, checkPermission("projects", "view"), getProjectsController);
 
     //milestone routes:
 
-    app.post('/admin/createMilestone', createMilestoneController);
+    app.post('/admin/createMilestone', authenticateToken, checkPermission("milestones", "create"), createMilestoneController);
 
-    app.put('/admin/updateMilestone/:id', updateMilestoneController);
+    app.put('/admin/updateMilestone/:id', authenticateToken, checkPermission("milestones", "update"), updateMilestoneController);
 
-    app.patch('/admin/deleteMilestone/:id', deleteMilestoneController);
+    app.patch('/admin/deleteMilestone/:id', authenticateToken, checkPermission("milestones", "delete"), deleteMilestoneController);
 
-    app.get('/admin/getMilestones', getMilestonesController);
+    app.get('/admin/getMilestones', authenticateToken, checkPermission("milestones", "view"), getMilestonesController);
 
     //submileston routes:
-    app.post('/admin/createSubMilestone', createSubMilestoneController);
+    app.post('/admin/createSubMilestone', authenticateToken, checkPermission("submilestones", "create"), createSubMilestoneController);
 
-    app.put('/admin/updateSubMilestone/:id', updateSubMilestoneController);
+    app.put('/admin/updateSubMilestone/:id', authenticateToken, checkPermission("submilestones", "update"), updateSubMilestoneController);
 
-    app.patch('/admin/deleteSubMilestone/:id', deleteSubMilestoneController);
+    app.patch('/admin/deleteSubMilestone/:id', authenticateToken, checkPermission("submilestones", "delete"), deleteSubMilestoneController);
 
-    app.get('/admim/getSubMilestones', getSubMilestonesController);
+    app.get('/admim/getSubMilestones', authenticateToken, checkPermission("submilestones", "view"), getSubMilestonesController);
 
     //delay routes:
-    app.post('/admin/createDelay', createDelayController);
+    app.post('/admin/createDelay', authenticateToken, checkPermission("delay", "create"), createDelayController);
 
-    app.put('/admin/updateDelay/:id', updateDelayController);
+    app.put('/admin/updateDelay/:id', authenticateToken, checkPermission("delay", "update"), updateDelayController);
 
-    app.patch('/admin/deleteDelay/:id', deleteDelayController);
+    app.patch('/admin/deleteDelay/:id', authenticateToken, checkPermission("delay", "delete"), deleteDelayController);
 
-    app.get('/admin/getDelaysByMilstoneId/:id', getDelaysByMilstoneIdController);
+    app.get('/admin/getDelaysByMilstoneId/:id', authenticateToken, checkPermission("delay", "view"), getDelaysByMilstoneIdController);
 
     //Project Dashboards:
-    app.get('/admin/getProjectProgress/:id', getProjectProgressController);
+    app.get('/admin/getProjectProgress/:id', authenticateToken, checkPermission("overview", "view"), getProjectProgressController);
 }

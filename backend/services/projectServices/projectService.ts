@@ -3,15 +3,16 @@ import Project from "../../models/projectModel";
 import { projectData } from "../../services/projectServices/project.interface";
 import Users from "../../models/userModel";
 import { handleError } from "../../utils/errorHandler";
-
+import Milestones from "../../models/milestoneModel";
 
 
 export class projectService {
-  async createProject(data: projectData): Promise<any> {
+async createProject(data: projectData): Promise<any> {
   try {
     const {
       userId,
       projectName,
+      client,
       description,
       startDate,
       endDate,
@@ -19,7 +20,7 @@ export class projectService {
       teamMembers,
     } = data;
 
-    if (!userId || !projectName || !startDate || !endDate || !priority) {
+    if (!userId || !projectName || !client || !startDate || !endDate || !priority) {
       throw new AppError("Bad Request! Missing required fields.", 400);
     }
 
@@ -37,7 +38,9 @@ export class projectService {
 
     if (isNaN(parsedStartDate.getTime())) throw new AppError("Invalid startDate.", 400);
     if (isNaN(parsedEndDate.getTime())) throw new AppError("Invalid endDate.", 400);
-    if (parsedEndDate < parsedStartDate) throw new AppError("endDate cannot be earlier than startDate.", 400);
+    if (parsedEndDate < parsedStartDate) {
+      throw new AppError("endDate cannot be earlier than startDate.", 400);
+    }
 
     const allowedPriorities = ["low", "medium", "high"];
     if (!allowedPriorities.includes(priority)) {
@@ -46,30 +49,25 @@ export class projectService {
 
     let normalizedTeamMembers: string[] = [];
 
-  if (teamMembers) {
-    if (Array.isArray(teamMembers)) {
-      normalizedTeamMembers = teamMembers
-        .map((id) => String(id).trim())
-        .filter(Boolean);
-    }
-    else if (typeof teamMembers === "string") {
-      normalizedTeamMembers = teamMembers
-        .split(",")
-        .map((id) => id.trim())
-        .filter(Boolean);
-    }
-    else {
-      throw new AppError(
-        "teamMembers must be an array of strings or a comma-separated string.",
-        400
-      );
-    }
+    if (teamMembers) {
+      if (Array.isArray(teamMembers)) {
+        normalizedTeamMembers = teamMembers.map((id) => String(id).trim()).filter(Boolean);
+      } else if (typeof teamMembers === "string") {
+        normalizedTeamMembers = teamMembers
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean);
+      } else {
+        throw new AppError(
+          "teamMembers must be an array of strings or a comma-separated string.",
+          400
+        );
+      }
 
-    if (normalizedTeamMembers.length > 100) {
-      throw new AppError("teamMembers limit exceeded (max 100).", 400);
+      if (normalizedTeamMembers.length > 100) {
+        throw new AppError("teamMembers limit exceeded (max 100).", 400);
+      }
     }
-  }
-
 
     const user = await Users.findById(userId);
     if (!user) throw new AppError("User not found.", 404);
@@ -87,6 +85,7 @@ export class projectService {
     const newProject = new Project({
       userId: user._id,
       projectName: cleanProjectName,
+      client: client.trim(), 
       description: description?.trim() || "",
       startDate: parsedStartDate,
       endDate: parsedEndDate,
@@ -96,18 +95,20 @@ export class projectService {
 
     const savedProject = await newProject.save();
 
-    const teamMemberIds = normalizedTeamMembers.length
-      ? normalizedTeamMembers
-      : [];
+    const teamMemberIds = normalizedTeamMembers.length ? normalizedTeamMembers : [];
 
     const teamMembersData = teamMemberIds.length
-      ? await Users.find(
-          { _id: { $in: teamMemberIds } },
-          { name: 1, email: 1 }
-        ).lean()
+      ? await Users.find({ _id: { $in: teamMemberIds } }, { name: 1, email: 1, role: 1 }).lean()
       : [];
 
-    
+    // NOTE: replace "Milestones" with your actual milestone model name/import
+    const [totalMilestones, completedMilestones] = await Promise.all([
+      Milestones.countDocuments({ projectId: savedProject._id }),
+      Milestones.countDocuments({ projectId: savedProject._id, milestoneStatus: "completed" }),
+    ]);
+
+    const completion =
+      totalMilestones === 0 ? 0 : Math.round((completedMilestones / totalMilestones) * 100);
 
     return {
       success: true,
@@ -119,6 +120,10 @@ export class projectService {
         startDate: savedProject.startDate,
         endDate: savedProject.endDate,
         priority: savedProject.priority,
+
+        // ✅ added attributes
+        milestone: totalMilestones,
+        completion,
 
         createdBy: {
           id: user._id,
@@ -132,21 +137,21 @@ export class projectService {
           name: member.name,
           email: member.email,
           role: member.role,
-    })),
-  },
-};
-
+        })),
+      },
+    };
   } catch (err) {
     return handleError(err as AppError);
   }
-  }
+}
 
-  async updateProject(data: projectData): Promise<any> {
+async updateProject(data: projectData): Promise<any> {
   try {
     const {
       projectId,
       userId,
       projectName,
+      client, // ✅ NEW
       description,
       startDate,
       endDate,
@@ -165,12 +170,6 @@ export class projectService {
 
     const project = await Project.findById(projectId);
     if (!project) throw new AppError("Project not found.", 404);
-
-    // Optional: ensure the project belongs to the same user (ownership check)
-    // If you use ABAC, you may already enforce this before calling service.
-    // if (String(project.userId) !== String(user._id)) {
-    //   throw new AppError("You are not allowed to update this project.", 403);
-    // }
 
     const updates: any = {};
 
@@ -192,6 +191,15 @@ export class projectService {
       }
 
       updates.projectName = cleanProjectName;
+    }
+
+    // ✅ NEW: update client
+    if (client !== undefined) {
+      const cleanClient = String(client).trim();
+      if (!cleanClient) {
+        throw new AppError("Client cannot be empty.", 400);
+      }
+      updates.client = cleanClient;
     }
 
     if (description !== undefined) {
@@ -232,9 +240,9 @@ export class projectService {
       let normalizedTeamMembers: string[] = [];
 
       if (Array.isArray(teamMembers)) {
-        normalizedTeamMembers = teamMembers.map((id) => String(id).trim()).filter(Boolean);
+        normalizedTeamMembers = teamMembers.map(id => String(id).trim()).filter(Boolean);
       } else if (typeof teamMembers === "string") {
-        normalizedTeamMembers = teamMembers.split(",").map((id) => id.trim()).filter(Boolean);
+        normalizedTeamMembers = teamMembers.split(",").map(id => id.trim()).filter(Boolean);
       } else {
         throw new AppError(
           "teamMembers must be an array of strings or a comma-separated string.",
@@ -249,10 +257,6 @@ export class projectService {
       updates.teamMembers = normalizedTeamMembers;
     }
 
-    if (Object.keys(updates).length === 0) {
-      throw new AppError("No valid fields provided to update.", 400);
-    }
-
     updates.projectStatus = projectStatus;
 
     const updatedProject = await Project.findByIdAndUpdate(
@@ -263,12 +267,11 @@ export class projectService {
 
     if (!updatedProject) throw new AppError("Project update failed.", 500);
 
-    const teamMemberIds: string[] = Array.isArray(updatedProject.teamMembers)
-      ? updatedProject.teamMembers
-      : [];
-
-    const teamMembersData = teamMemberIds.length
-      ? await Users.find({ _id: { $in: teamMemberIds } }, { name: 1, email: 1 }).lean()
+    const teamMembersData = Array.isArray(updatedProject.teamMembers)
+      ? await Users.find(
+          { _id: { $in: updatedProject.teamMembers } },
+          { name: 1, email: 1 }
+        ).lean()
       : [];
 
     return {
@@ -277,6 +280,7 @@ export class projectService {
       project: {
         id: updatedProject._id,
         projectName: updatedProject.projectName,
+        client: updatedProject.client, // ✅ RETURN
         description: updatedProject.description,
         startDate: updatedProject.startDate,
         endDate: updatedProject.endDate,
@@ -289,7 +293,7 @@ export class projectService {
           role: user.role,
         },
 
-        teamMembers: teamMembersData.map((member) => ({
+        teamMembers: teamMembersData.map(member => ({
           id: member._id,
           name: member.name,
           email: member.email,
@@ -300,9 +304,9 @@ export class projectService {
   } catch (err) {
     return handleError(err as AppError);
   }
-  }
+}
 
-  async deleteProject(data: { projectId: string; userId: string }): Promise<any> {
+async deleteProject(data: { projectId: string; userId: string }): Promise<any> {
   try {
     const { projectId, userId } = data;
 
@@ -344,9 +348,9 @@ export class projectService {
   } catch (err) {
     return handleError(err as AppError);
   }
-  }
+}
 
-  async getProjects(query: any): Promise<any> {
+async getProjects(query: any): Promise<any> {
   try {
     // -------- 1) Pagination --------
     const page = Math.max(parseInt(query.page, 10) || 1, 1);
@@ -355,7 +359,6 @@ export class projectService {
 
     // -------- 2) Filters --------
     const filter: any = {};
-
     filter.status = query.status ? String(query.status).toUpperCase() : "Y";
 
     if (query.userId) {
@@ -373,9 +376,7 @@ export class projectService {
 
     if (query.search) {
       const search = String(query.search).trim();
-      if (search) {
-        filter.projectName = { $regex: search, $options: "i" };
-      }
+      if (search) filter.projectName = { $regex: search, $options: "i" };
     }
 
     if (query.startFrom || query.startTo) {
@@ -415,21 +416,59 @@ export class projectService {
         .populate({
           path: "userId",
           model: "Users",
-          select: "-password", // return all user fields except password
+          select: "-password",
         })
         .populate({
           path: "teamMembers",
           model: "Users",
-          select: "-password", // return all team member fields except password
+          select: "-password",
         })
         .lean(),
-
       Project.countDocuments(filter),
     ]);
 
     const totalPages = Math.ceil(total / limit);
 
-    // -------- 4) Return --------
+    // -------- 4) Add milestone + completion for each project (single aggregation) --------
+    const projectIds = projects.map((p: any) => p._id);
+
+    let milestoneStatsByProjectId = new Map<string, { total: number; completed: number }>();
+
+    if (projectIds.length) {
+      // NOTE: replace "Milestone" with your actual milestone model import/name
+      const stats = await Milestones.aggregate([
+        { $match: { projectId: { $in: projectIds } } },
+        {
+          $group: {
+            _id: "$projectId",
+            total: { $sum: 1 },
+            completed: {
+              $sum: {
+                $cond: [{ $eq: ["$milestoneStatus", "completed"] }, 1, 0],
+              },
+            },
+          },
+        },
+      ]);
+
+      milestoneStatsByProjectId = new Map(
+        stats.map((s: any) => [String(s._id), { total: s.total, completed: s.completed }])
+      );
+    }
+
+    const projectsWithMilestones = projects.map((p: any) => {
+      const stat = milestoneStatsByProjectId.get(String(p._id)) || { total: 0, completed: 0 };
+      const completion = stat.total === 0 ? 0 : Math.round((stat.completed / stat.total) * 100);
+
+      return {
+        ...p,
+        // client is already part of p if it's in schema and not excluded
+        milestone: stat.total,
+        completion,
+      };
+    });
+
+    // -------- 5) Return --------
     return {
       success: true,
       message: "Projects retrieved successfully.",
@@ -439,10 +478,10 @@ export class projectService {
         limit,
         totalPages,
       },
-      projects,
+      projects: projectsWithMilestones,
     };
   } catch (err) {
     return handleError(err as AppError);
   }
-  }
+}
 }
