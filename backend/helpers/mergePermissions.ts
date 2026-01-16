@@ -19,22 +19,9 @@ export const mergePermissions = (
       ) {
         (result[moduleKey] as any)[actionKey] =
           (incoming[moduleKey] as any)[actionKey];
-  if (!incoming) return base;
-
-  const merged: IUserPermissions = JSON.parse(JSON.stringify(base));
-
-  for (const moduleKey in incoming) {
-    if (!merged[moduleKey as keyof IUserPermissions]) continue;
-
-    for (const actionKey in incoming[moduleKey as keyof IUserPermissions]) {
-      if (actionKey in merged[moduleKey as keyof IUserPermissions]) {
-        merged[moduleKey as keyof IUserPermissions][actionKey] =
-          incoming[moduleKey as keyof IUserPermissions]?.[actionKey] ?? false;
       }
     }
   }
 
   return result;
-  return merged;
-
 };

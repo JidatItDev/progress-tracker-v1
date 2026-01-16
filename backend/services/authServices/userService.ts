@@ -25,7 +25,6 @@ const DEFAULT_PERMISSIONS: IUserPermissions = {
 
 
 export class UserService {
-<<<<<<< HEAD
  async createUser(data: userData): Promise<any> {
     try {
       const { name, email, role, permissions } = data;
@@ -114,91 +113,6 @@ export class UserService {
       return handleError(err as AppError);
     }
   }
-=======
-async createUser(data: userData): Promise<any> {
-  try {
-    const { name, email, role, permissions } = data;
-
-    if (!name || !email || !role) {
-      throw new AppError("Bad Request! Missing required fields.", 400);
-    }
-
-    const cleanName = String(name).trim();
-    const cleanEmail = String(email).trim().toLowerCase();
-
-    if (!cleanName) {
-      throw new AppError("name is required.", 400);
-    }
-
-    if (!cleanEmail) {
-      throw new AppError("email is required.", 400);
-    }
-
-    // -----------------------------
-    // Check duplicate email (Mongoose)
-    // -----------------------------
-    const existingUser = await Users.findOne({ email: cleanEmail }).lean();
-    if (existingUser) {
-      throw new AppError("User with this email already exists.", 409);
-    }
-
-    // -----------------------------
-    // Generate password
-    // -----------------------------
-    const password = generateRandomPassword(8);
-
-    // -----------------------------
-    // Apply permissions SAFELY
-    // -----------------------------
-    const finalPermissions = mergePermissions(
-      DEFAULT_PERMISSIONS,
-      permissions
-    );
-
-    // -----------------------------
-    // Create user
-    // -----------------------------
-    const newUser = new Users({
-      name: cleanName,
-      email: cleanEmail,
-      password,
-      role,
-      permissions: finalPermissions,
-    });
-
-    const savedUser = await newUser.save();
-
-    // -----------------------------
-    // Send welcome email
-    // -----------------------------
-    const mailTemplate = welcomeUserTemplate({
-      name: cleanName,
-      email: cleanEmail,
-      password,
-    });
-
-    await sendMail({
-      to: cleanEmail,
-      subject: mailTemplate.subject,
-      html: mailTemplate.html,
-    });
-
-    return {
-      success: true,
-      message: "User created successfully. Credentials sent via email.",
-      user: {
-        id: savedUser._id,
-        name: savedUser.name,
-        email: savedUser.email,
-        role: savedUser.role,
-        permissions: savedUser.permissions,
-      },
-    };
-  } catch (err) {
-    return handleError(err as AppError);
-  }
-}
->>>>>>> dev
 
 
  async updateUser(data: userData): Promise<any> {
