@@ -18,13 +18,20 @@
 							"name": "Create User",
 							"request": {
 								"auth": {
-									"type": "basic"
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoidGVhbSIsImVtYWlsIjoiYXFlZWw0NjIyQGdtYWlsLmNvbSIsImlhdCI6MTc2ODQ3OTkzMiwiZXhwIjoxNzY4NTY2MzMyfQ._WXCj7_yMVZxJtSGWF7Tdv2QaPL0qBxv4UA_cnuRfjQ",
+											"type": "string"
+										}
+									]
 								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Aqeel bro\",\r\n    \"email\": \"aqeel4622@gmail.com\",\r\n    \"role\": \"team\",\r\n    \"permissions\": {\r\n        \"overview\": {\r\n            \"view\": true\r\n        },\r\n        \"projects\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"milestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"clients\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": false\r\n        },\r\n        \"activity\": {\r\n            \"view\": true\r\n        },\r\n        \"users\": {\r\n            \"view\": true,\r\n            \"create\": false,\r\n            \"update\": false\r\n        },\r\n        \"admin\": {\r\n            \"view\": false\r\n        }\r\n    }\r\n}",
+									"raw": "{\r\n    \"name\": \"Example Team\",\r\n    \"email\": \"example@team.com\",\r\n    \"role\": \"team\",\r\n    \"permissions\": {\r\n        \"overview\": {\r\n            \"view\": true\r\n        },\r\n        \"projects\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"submilestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"delay\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"milestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"clients\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": false\r\n        },\r\n        \"activity\": {\r\n            \"view\": true\r\n        },\r\n        \"users\": {\r\n            \"view\": true,\r\n            \"create\": false,\r\n            \"update\": false\r\n        },\r\n        \"admin\": {\r\n            \"view\": false\r\n        }\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -51,7 +58,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"email\": \"abc@gmail.com\",\r\n  \"password\": \"9cki0n85\"\r\n}\r\n",
+									"raw": "{\r\n  \"email\": \"aqeel4622@gmail.com\",\r\n  \"password\": \"gQm4Z7ew\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -73,11 +80,21 @@
 						{
 							"name": "Update User",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
 								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Aqeel\",\r\n    \"email\": \"aqeel4622@gmail.com\",\r\n    \"role\": \"team\",\r\n    \"permissions\": {\r\n        \"overview\": {\r\n            \"view\": true\r\n        },\r\n        \"projects\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": true\r\n        },\r\n        \"milestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": true\r\n        },\r\n        \"clients\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true\r\n        },\r\n        \"activity\": {\r\n            \"view\": true\r\n        },\r\n        \"users\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true\r\n        },\r\n        \"admin\": {\r\n            \"view\": true\r\n        }\r\n    }\r\n}",
+									"raw": "{\r\n    \"name\": \"Example Client\",\r\n    \"email\": \"example@client.com\",\r\n    \"role\": \"admin\",\r\n    \"permissions\": {\r\n        \"overview\": {\r\n            \"view\": true\r\n        },\r\n        \"projects\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"milestones\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": true,\r\n            \"delete\": false\r\n        },\r\n        \"clients\": {\r\n            \"view\": true,\r\n            \"create\": true,\r\n            \"update\": false\r\n        },\r\n        \"activity\": {\r\n            \"view\": true\r\n        },\r\n        \"users\": {\r\n            \"view\": true,\r\n            \"create\": false,\r\n            \"update\": false\r\n        },\r\n        \"admin\": {\r\n            \"view\": false\r\n        }\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -85,32 +102,60 @@
 									}
 								},
 								"url": {
-									"raw": "{{link}}/admin/updateUser/69674fb53cc8000fdca9456c",
+									"raw": "{{link}}/admin/updateUser/6969d863c136b3293d943c4f",
 									"host": [
 										"{{link}}"
 									],
 									"path": [
 										"admin",
 										"updateUser",
-										"69674fb53cc8000fdca9456c"
+										"6969d863c136b3293d943c4f"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "New Request",
+							"name": "Get Users",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
-									"raw": "{{link}}/admin/getUsers",
+									"raw": "{{link}}/admin/getUsers?page=2",
 									"host": [
 										"{{link}}"
 									],
 									"path": [
 										"admin",
 										"getUsers"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										}
 									]
 								}
 							},
@@ -124,11 +169,21 @@
 						{
 							"name": "Create Project",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"userId\": \"695dfba170b6594604603871\",\r\n  \"projectName\": \"Project Tracker\",\r\n  \"description\": \"Internal tool\",\r\n  \"startDate\": \"2026-01-10\",\r\n  \"endDate\": \"2026-02-10\",\r\n  \"priority\": \"high\",\r\n  \"teamMembers\": [\"695dfba170b6594604603871\", \"695ceed572386aaa8d8cd95d\"]\r\n}\r\n",
+									"raw": "{\r\n  \"userId\": \"69674fb53cc8000fdca9456c\",\r\n  \"projectName\": \"Project Tracker\",\r\n  \"client\": \"ABC Company\",\r\n  \"description\": \"Internal tool\",\r\n  \"startDate\": \"2026-01-10\",\r\n  \"endDate\": \"2026-02-10\",\r\n  \"priority\": \"high\",\r\n  \"teamMembers\": [\"695dfba170b6594604603871\", \"695ceed572386aaa8d8cd95d\"]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -210,6 +265,16 @@
 								"disableBodyPruning": true
 							},
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -242,11 +307,21 @@
 						{
 							"name": "Create Milestone",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTY3NGZiNTNjYzgwMDBmZGNhOTQ1NmMiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFxZWVsNDYyMkBnbWFpbC5jb20iLCJpYXQiOjE3Njg1NDQzMDEsImV4cCI6MTc2ODYzMDcwMX0.R4TcQoXMwNfrwHBYhcFA2MrdFIV9DFgFim5M2wJt9LY",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"projectId\": \"696095805c0c4faed49c8613\",\r\n  \"milestoneName\": \"Design Phase\",\r\n  \"description\": \"Complete UI/UX design and approval\",\r\n  \"startDate\": \"2026-02-01\",\r\n  \"endDate\": \"2026-02-15\"\r\n}\r\n",
+									"raw": "{\r\n    \"projectId\": \"6969eeba7b434f6b4802c240\",\r\n    \"milestoneName\": \"Design Phase\",\r\n    \"description\": \"Complete UI/UX design and approval\",\r\n    \"startDate\": \"2026-01-11\",\r\n    \"endDate\": \"2026-01-15\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

@@ -12,6 +12,7 @@ enum Priority {
 interface IProject extends Document {
   userId: Types.ObjectId;
   projectName: string;
+  client: string;
   description: string;
   startDate: Date;
   endDate: Date;
@@ -34,6 +35,13 @@ export const ProjectSchema: Schema<IProject> = new Schema(
     },
 
     projectName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
+
+    client: {
       type: String,
       required: true,
       trim: true,
