@@ -96,7 +96,7 @@ const Projects = () => {
 
   return (
     <>
-      {/* ✅ ToastContainer lives on THIS page */}
+      {/*  ToastContainer lives on THIS page */}
       <ToastContainer
         position="top-right"
         autoClose={3000}

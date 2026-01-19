@@ -74,7 +74,7 @@ export const updateMilestoneController = async (
       status: "Y",
       createdAt: undefined,
       updatedAt: undefined,
-      milestoneStatus: MilestoneStatus.ACTIVE, // ✅ FIX
+      milestoneStatus: MilestoneStatus.ACTIVE, //  FIX
     });
 
     if (!result.success) {

@@ -27,7 +27,7 @@ export const authenticateToken = async (
 
     const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
 
-    const userId = decoded.userId || decoded.userId; // ✅ KEY FIX
+    const userId = decoded.userId || decoded.userId; 
 
     if (!userId) {
       return res.status(401).json({ message: "Invalid token payload" });

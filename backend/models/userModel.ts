@@ -14,14 +14,14 @@ export interface IPermissionModuleViewOnly {
 export interface IPermissionModuleCrud {
   view: boolean;
   create: boolean;
-  update: boolean;   // ✅ added
+  update: boolean;   //  added
   delete: boolean;
 }
 
 export interface IPermissionModuleViewCreateUpdate {
   view: boolean;
   create: boolean;
-  update: boolean;   // ✅ added
+  update: boolean;   //  added
 }
 
 export interface IUserPermissions {
@@ -44,7 +44,7 @@ export interface IUser extends Document {
   date: Date;
   role: UserRole;
   status: "Y" | "N";
-  permissions: IUserPermissions; // ✅
+  permissions: IUserPermissions; // 
   createdAt: Date;
 }
 
