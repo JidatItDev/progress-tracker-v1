@@ -1,14 +1,15 @@
-"use Client";
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { notFound, useParams } from "next/navigation";
+import axios from "axios";
 import DashboardLayout from "../../../components/dashboard/dashboardlayout/page";
 import Tabs from "@/app/components/tabscomponent/page";
 import Image from "next/image";
-import ButtonPink from "@/app/components/button/pinkbutton/page";
 import MilestoneCard from "../../../components/cards/milestonecard/page";
-import {useAuthStore} from "@/app/store/useAuthStore";
 
 export interface Milestone {
-  id: number;
+  _id: string;
   title: string;
   date: string;
   projectName: string;
@@ -17,427 +18,176 @@ export interface Milestone {
 }
 
 interface Team {
-  id: number;
+  _id: string;
   name: string;
+  email: string;
   role: string;
-  avatar: string;
+  avatar?: string;
 }
+
 interface Activity {
-  id: number;
+  _id: string;
   updatedby: string;
   updatedtime: string;
   updateddate: string;
   time: string;
 }
-export type PermissionAction = "view" | "create" | "update" | "delete";
-
-export type PermissionMap = {
-  [resource: string]: Partial<Record<PermissionAction, boolean>>;
-};
-
-export type User = {
-  id: string;
-  name: string;
-  role: "admin" | "client" | "user";
-  permissions: PermissionMap;
-};
 
 interface Project {
-  id: number;
-  name: string;
-  milestones: Milestone[];
-  status: "active" | "completed" | "on-hold";
-  client: string;
-  progress: string;
-  priority: "High" | "Medium" | "Low";
-  completion: number;
-  team: Team[];
-  activity: Activity[];
-  time: string;
+  _id: string;
+  projectName: string;
+  description: string;
   startDate: string;
   endDate: string;
-  deliveryDate: string;
-  daysRemaining: number;
-}
-const projectData: Project[] = [
-  {
-    id: 1,
-    name: "Website Redesign",
-    milestones: [
-      {
-        id: 1,
-        title: "Design Phase",
-        date: "2023-06-10",
-        projectName: "Website Redesign",
-        status: "completed",
-        progress: 100,
-      },
-      {
-        id: 2,
-        title: "Development Phase",
-        date: "2023-06-20",
-        projectName: "Website Redesign",
-        status: "active",
-        progress: 60,
-      },
-      {
-        id: 3,
-        title: "Testing Phase",
-        date: "2023-06-28",
-        projectName: "Website Redesign",
-        status: "active",
-        progress: 30,
-      },
-    ],
-    status: "active",
-    activity: [
-      {
-        id: 1,
-        updatedby: "Alice Johnson",
-        updatedtime: "2023-06-01T10:00:00",
-        updateddate: "2023-06-01",
-        time: "2 hours ago",
-      },
-    ],
-    client: "ABC Company",
-    progress: "In Progress",
-    priority: "High",
-    completion: 50,
-    team: [
-      {
-        id: 1,
-        name: "Alice Johnson",
-        role: "Project Manager",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 2,
-        name: "Bob Smith",
-        role: "Frontend Developer",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 3,
-        name: "Charlie Brown",
-        role: "UI/UX Designer",
-        avatar: "/avatar.png",
-      },
-    ],
-    time: "2 hours ago",
-    startDate: "2023-06-01",
-    endDate: "2023-06-30",
-    deliveryDate: "2023-07-15",
-    daysRemaining: 15,
-  },
-  {
-    id: 2,
-    name: "Mobile App Development",
-    milestones: [
-      {
-        id: 1,
-        title: "Planning",
-        date: "2023-06-05",
-        projectName: "Mobile App Development",
-        status: "completed",
-        progress: 100,
-      },
-      {
-        id: 2,
-        title: "UI Design",
-        date: "2023-06-15",
-        projectName: "Mobile App Development",
-        status: "active",
-        progress: 70,
-      },
-    ],
-    status: "active",
-    client: "XYZ Corporation",
-    progress: "In Progress",
-    priority: "Medium",
-    completion: 34,
-    activity: [
-      {
-        id: 1,
-        updatedby: "Alice Johnson",
-        updatedtime: "2023-06-01T10:00:00",
-        updateddate: "2023-06-01",
-        time: "2 hours ago",
-      },
-    ],
-    team: [
-      {
-        id: 1,
-        name: "Alice Johnson",
-        role: "Project Manager",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 2,
-        name: "Bob Smith",
-        role: "Frontend Developer",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 3,
-        name: "Charlie Brown",
-        role: "UI/UX Designer",
-        avatar: "/avatar.png",
-      },
-    ],
-    time: "2 hours ago",
-    startDate: "2023-06-01",
-    endDate: "2023-06-30",
-    deliveryDate: "2023-07-15",
-    daysRemaining: 15,
-  },
-  {
-    id: 3,
-    name: "App Development",
-    milestones: [
-      {
-        id: 1,
-        title: "Backend Setup",
-        date: "2023-06-08",
-        projectName: "App Development",
-        status: "active",
-        progress: 45,
-      },
-    ],
-    status: "active",
-    activity: [
-      {
-        id: 1,
-        updatedby: "Alice Johnson",
-        updatedtime: "2023-06-01T10:00:00",
-        updateddate: "2023-06-01",
-        time: "2 hours ago",
-      },
-    ],
-    client: "XYZ Corporation",
-    progress: "In Progress",
-    priority: "Medium",
-    completion: 34,
-    team: [
-      {
-        id: 1,
-        name: "Alice Johnson",
-        role: "Project Manager",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 2,
-        name: "Bob Smith",
-        role: "Frontend Developer",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 3,
-        name: "Charlie Brown",
-        role: "UI/UX Designer",
-        avatar: "/avatar.png",
-      },
-    ],
-    time: "2 hours ago",
-    startDate: "2023-06-01",
-    endDate: "2023-06-30",
-    deliveryDate: "2023-07-15",
-    daysRemaining: 15,
-  },
-  {
-    id: 4,
-    name: "App Development",
-    milestones: [
-      {
-        id: 1,
-        title: "API Integration",
-        date: "2023-06-12",
-        projectName: "App Development",
-        status: "active",
-        progress: 50,
-      },
-    ],
-    status: "active",
-    client: "XYZ Corporation",
-    progress: "In Progress",
-    priority: "Medium",
-    activity: [
-      {
-        id: 1,
-        updatedby: "Alice Johnson",
-        updatedtime: "2023-06-01T10:00:00",
-        updateddate: "2023-06-01",
-        time: "2 hours ago",
-      },
-    ],
-    completion: 34,
-    team: [
-      {
-        id: 1,
-        name: "Alice Johnson",
-        role: "Project Manager",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 2,
-        name: "Bob Smith",
-        role: "Frontend Developer",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 3,
-        name: "Charlie Brown",
-        role: "UI/UX Designer",
-        avatar: "/avatar.png",
-      },
-    ],
-    time: "2 hours ago",
-    startDate: "2023-06-01",
-    endDate: "2023-06-30",
-    deliveryDate: "2023-07-15",
-    daysRemaining: 15,
-  },
-  {
-    id: 5,
-    name: "App Development",
-    activity: [
-      {
-        id: 1,
-        updatedby: "Alice Johnson",
-        updatedtime: "2023-06-01T10:00:00",
-        updateddate: "2023-06-01",
-        time: "2 hours ago",
-      },
-    ],
-    milestones: [
-      {
-        id: 1,
-        title: "Quality Assurance",
-        date: "2023-06-25",
-        projectName: "App Development",
-        status: "active",
-        progress: 20,
-      },
-    ],
-    status: "active",
-    client: "XYZ Corporation",
-    progress: "In Progress",
-    priority: "Medium",
-    completion: 34,
-    team: [
-      {
-        id: 1,
-        name: "Alice Johnson",
-        role: "Project Manager",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 2,
-        name: "Bob Smith",
-        role: "Frontend Developer",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 3,
-        name: "Charlie Brown",
-        role: "UI/UX Designer",
-        avatar: "/avatar.png",
-      },
-    ],
-    time: "2 hours ago",
-    startDate: "2023-06-01",
-    endDate: "2023-06-30",
-    deliveryDate: "2023-07-15",
-    daysRemaining: 15,
-  },
-  {
-    id: 6,
-    name: "App Development",
-    activity: [
-      {
-        id: 1,
-        updatedby: "Alice Johnson",
-        updatedtime: "2023-06-01T10:00:00",
-        updateddate: "2023-06-01",
-        time: "2 hours ago",
-      },
-    ],
-    milestones: [
-      {
-        id: 1,
-        title: "Deployment",
-        date: "2023-06-30",
-        projectName: "App Development",
-        status: "active",
-        progress: 10,
-      },
-    ],
-    status: "active",
-    client: "XYZ Corporation",
-    progress: "In Progress",
-    priority: "Medium",
-    completion: 34,
-    team: [
-      {
-        id: 1,
-        name: "Alice Johnson",
-        role: "Project Manager",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 2,
-        name: "Bob Smith",
-        role: "Frontend Developer",
-        avatar: "/avatar.png",
-      },
-      {
-        id: 3,
-        name: "Charlie Brown",
-        role: "UI/UX Designer",
-        avatar: "/avatar.png",
-      },
-    ],
-    time: "2 hours ago",
-    startDate: "2023-06-01",
-    endDate: "2023-06-30",
-    deliveryDate: "2023-07-15",
-    daysRemaining: 15,
-  },
-];
-
-interface ProjectPageProps {
-  params: {
-    id: string;
+  priority: "high" | "medium" | "low";
+  projectStatus: "active" | "inactive" | "completed";
+  status: string;
+  teamMembers: Team[];
+  milestones?: Milestone[];
+  activity?: Activity[];
+  userId: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+    status: string;
   };
+  createdAt: string;
+  updatedAt: string;
 }
 
-const ProjectPage = async ({ params }: ProjectPageProps) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const user = useAuthStore((s) => s.user);
-  if (!user?.permissions.projects?.view && user?.role !== "admin") {
-    return <div className="text-red-600">Access Denied</div>;
+const ProjectPage = () => {
+  const params = useParams();
+  const id = params?.id as string;
+  
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Fetch project details
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+
+        // First, fetch all projects
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/getProjects`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const projects = response.data.projects || response.data;
+        
+        // Find the specific project by ID
+        const foundProject = projects.find((p: Project) => p._id === id);
+        
+        if (!foundProject) {
+          setError("Project not found");
+          return;
+        }
+
+        if (!foundProject) {
+          setError("Project not found");
+          return;
+        }
+
+        setProject(foundProject);
+      } catch (err) {
+        console.error("Error fetching project:", err);
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 404) {
+            setError("Project not found");
+          } else {
+            setError(err.response?.data?.message || "Failed to fetch project");
+          }
+        } else {
+          setError("An unexpected error occurred");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProject();
+    }
+  }, [id]);
+
+  // Calculate days remaining
+  const getDaysRemaining = (endDate: string) => {
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
+  // Calculate completion percentage
+  const getCompletionPercentage = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+    
+    const total = end.getTime() - start.getTime();
+    const elapsed = now.getTime() - start.getTime();
+    
+    const percentage = Math.min(Math.max((elapsed / total) * 100, 0), 100);
+    return Math.round(percentage);
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-500">Loading project...</div>
+        </div>
+      </DashboardLayout>
+    );
   }
-  const { id } = await params;
-  const projectId = Number(id);
 
-  const project = projectData.find((p) => p.id === projectId);
+  // Error state
+  if (error || !project) {
+    return (
+      <DashboardLayout>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error || "Project not found"}
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-  if (!project) return notFound();
-
-  // Calculate milestone summary for Progress Summary section
-  const totalMilestones = project.milestones.length;
-  const completedMilestones = project.milestones.filter(
+  // Calculate milestone summary
+  const totalMilestones = project.milestones?.length || 0;
+  const completedMilestones = project.milestones?.filter(
     (m) => m.status === "completed"
-  ).length;
+  ).length || 0;
   const remainingMilestones = totalMilestones - completedMilestones;
+  const completion = getCompletionPercentage(project.startDate, project.endDate);
+  const daysRemaining = getDaysRemaining(project.endDate);
 
   return (
     <DashboardLayout>
       <div className="max-w-full">
         <div className="mb-6">
           <h1 className="text-3xl font-semibold text-black">
-            Project: {project.name}
+            Project: {project.projectName}
           </h1>
-          <p className="text-base text-gray-500">Client: {project.client}</p>
+          <p className="text-base text-gray-500">
+            Client: {project.userId?.name || 'Unassigned'}
+          </p>
         </div>
         <Tabs tabs={["Overview", "Milestones", "Members", "Activity"]}>
           {{
@@ -450,11 +200,7 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                       Project Overview
                     </h2>
                     <p className="text-sm text-gray-600 leading-relaxed mb-8">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Quaerat delectus molestiae eaque beatae necessitatibus
-                      maxime accusantium sequi recusandae, tenetur repellat
-                      omnis, est architecto et quisquam iure quo. Accusantium,
-                      rerum itaque.
+                      {project.description || 'No description available'}
                     </p>
                     <div className="grid grid-cols-2 gap-x-8 space-y-4 mt-5 ">
                       <div>
@@ -463,7 +209,7 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                         </p>
                         <p className="text-sm font-medium text-gray-900 flex items-center gap-1">
                           <span className="text-gray-400">📅</span>{" "}
-                          {project.startDate}
+                          {new Date(project.startDate).toLocaleDateString()}
                         </p>
                       </div>
 
@@ -473,17 +219,16 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                         </p>
                         <p className="text-sm font-medium text-gray-900 flex items-center gap-1">
                           <span className="text-gray-400">📅</span>{" "}
-                          {project.endDate}
+                          {new Date(project.endDate).toLocaleDateString()}
                         </p>
                       </div>
 
                       <div>
                         <p className="text-xs text-black font-semibold mb-1">
-                          Delivery Date
+                          Status
                         </p>
-                        <p className="text-sm font-medium text-gray-900 flex items-center gap-1">
-                          <span className="text-gray-400">📅</span>{" "}
-                          {project.deliveryDate}
+                        <p className="text-sm font-medium text-gray-900 capitalize">
+                          {project.projectStatus}
                         </p>
                       </div>
 
@@ -492,7 +237,7 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                           Days Remaining
                         </p>
                         <p className="text-sm font-medium text-gray-900">
-                          {project.daysRemaining} days
+                          {daysRemaining > 0 ? `${daysRemaining} days` : 'Overdue'}
                         </p>
                       </div>
                     </div>
@@ -504,19 +249,19 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                       <h2 className="text-normal font-semibold text-white px-2">
                         Progress Summary
                       </h2>
-                      <span className="text-xs text-pink-500 font-semibold p-2">
+                      <span className="text-xs text-pink-500 font-semibold p-2 capitalize">
                         {project.priority}
                       </span>
                     </div>
 
                     <div className="text-center mb-4">
                       <div className="text-4xl font-bold text-white mb-2">
-                        {project.completion}%
+                        {completion}%
                       </div>
                       <div className="w-full bg-gray-700 rounded-full h-2">
                         <div
                           className="bg-pink-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${project.completion}%` }}
+                          style={{ width: `${completion}%` }}
                         />
                       </div>
                     </div>
@@ -530,11 +275,9 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                         </span>
                       </div>
                       <div className="flex justify-between text-white">
-                        <span>Inprogress</span>
+                        <span>In Progress</span>
                         <span className="font-medium">
-                          {totalMilestones -
-                            completedMilestones -
-                            remainingMilestones}{" "}
+                          {totalMilestones - completedMilestones - remainingMilestones}{" "}
                           milestones
                         </span>
                       </div>
@@ -553,39 +296,33 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
                     <h1 className="text-lg font-semibold text-gray-900">
                       Team Members
                     </h1>
-                    {/* <ButtonPink
-                      className="py-2 px-4 border border-gray-300 rounded-lg bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
-                      buttonname="+ Add Members"
-                      onClick={() => console.log("Add Members Button")}
-
-                    /> */}
                   </div>
 
-                  <div className="flex  gap-3">
-                    {project.team.map((member) => (
-                      <div
-                        key={member.id}
-                        className="bg-gray-50 rounded-lg p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Image
-                            src={member.avatar}
-                            alt={member.name}
-                            width={48}
-                            height={48}
-                            className="rounded-full object-cover"
-                          />
-                          <div>
-                            <h3 className="text-sm font-semibold text-gray-900">
-                              {member.role}
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                              {member.name}
-                            </p>
+                  <div className="flex gap-3">
+                    {project.teamMembers && project.teamMembers.length > 0 ? (
+                      project.teamMembers.map((member) => (
+                        <div
+                          key={member._id}
+                          className="bg-gray-50 rounded-lg p-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center text-white font-semibold">
+                              {member.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-semibold text-gray-900 capitalize">
+                                {member.role}
+                              </h3>
+                              <p className="text-xs text-gray-500">
+                                {member.name}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No team members assigned</p>
+                    )}
                   </div>
                 </div>
               </>
@@ -593,108 +330,97 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
 
             Milestones: (
               <div className="space-y-4">
-                {project.milestones.map((milestone) => (
-                  <MilestoneCard key={milestone.id} milestone={milestone} />
-                ))}
+                {project.milestones && project.milestones.length > 0 ? (
+                  project.milestones.map((milestone) => (
+                    <MilestoneCard key={milestone._id} milestone={milestone} />
+                  ))
+                ) : (
+                  <div className="bg-white rounded-xl p-6 text-center text-gray-500">
+                    No milestones found for this project
+                  </div>
+                )}
               </div>
             ),
 
             Members: (
               <div className="bg-white rounded-xl p-6">
-                {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-semibold text-gray-900">
                     Team Members
                   </h2>
-
-                  {/* <ButtonPink
-                    className="bg-black text-white px-4 py-2 rounded-md text-sm"
-                    buttonname="+ Add Members"
-                    onClick={() => console.log("Add Members Button")}
-
-                  /> */}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {project.team.map((member) => (
-                    <div
-                      key={member.id}
-                      className="flex items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 hover:bg-gray-100 transition"
-                    >
-                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-200">
-                        <Image
-                          src={member.avatar}
-                          alt={member.name}
-                          width={36}
-                          height={36}
-                          className="rounded-full object-cover"
-                        />
-                      </div>
+                  {project.teamMembers && project.teamMembers.length > 0 ? (
+                    project.teamMembers.map((member) => (
+                      <div
+                        key={member._id}
+                        className="flex items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 hover:bg-gray-100 transition"
+                      >
+                        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-neutral-800 text-white font-semibold">
+                          {member.name.charAt(0).toUpperCase()}
+                        </div>
 
-                      <div className="leading-tight">
-                        <p className="text-sm font-medium text-gray-900">
-                          {member.role}
-                        </p>
-                        <p className="text-xs text-gray-500">{member.name}</p>
+                        <div className="leading-tight">
+                          <p className="text-sm font-medium text-gray-900 capitalize">
+                            {member.role}
+                          </p>
+                          <p className="text-xs text-gray-500">{member.name}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500 col-span-3">
+                      No team members assigned
+                    </p>
+                  )}
                 </div>
               </div>
             ),
 
             Activity: (
-              <>
-                <div className="bg-white rounded-lg p-6">
-                  <h1 className="text-lg font-semibold text-gray-900 mb-4">
-                    Activity Log
-                  </h1>
-                  {project.activity && project.activity.length > 0 ? (
-                    <div className="space-y-4">
-                      {project.activity.map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-b-0"
-                        >
-                          <div className="w-2 h-2 rounded-full bg-pink-500 mt-2 " />
+              <div className="bg-white rounded-lg p-6">
+                <h1 className="text-lg font-semibold text-gray-900 mb-4">
+                  Activity Log
+                </h1>
+                {project.activity && project.activity.length > 0 ? (
+                  <div className="space-y-4">
+                    {project.activity.map((activity) => (
+                      <div
+                        key={activity._id}
+                        className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="w-2 h-2 rounded-full bg-pink-500 mt-2" />
 
-                          {/* Content */}
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <p className="text-sm text-gray-700">
-                                  Team member{" "}
-                                  <span className="font-medium text-green-500">
-                                    {activity.updatedby}
-                                  </span>{" "}
-                                  updated the milestone eta{" "}
-                                  {project.milestones[0]?.title ||
-                                    "Project Milestone"}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Changed eta from september 10 to
-                                </p>
-                                <div className="inline-block mt-2 px-3 py-1 bg-black text-white text-xs rounded-md">
-                                  {activity.updateddate}
-                                </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-700">
+                                Team member{" "}
+                                <span className="font-medium text-green-500">
+                                  {activity.updatedby}
+                                </span>{" "}
+                                updated the milestone
+                              </p>
+                              <div className="inline-block mt-2 px-3 py-1 bg-black text-white text-xs rounded-md">
+                                {new Date(activity.updateddate).toLocaleDateString()}
                               </div>
-
-                              {/* Time ago */}
-                              <span className="text-xs text-gray-400 whitespace-nowrap">
-                                {activity.time}
-                              </span>
                             </div>
+
+                            <span className="text-xs text-gray-400 whitespace-nowrap">
+                              {activity.time}
+                            </span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500">
-                      No activity to display
-                    </p>
-                  )}
-                </div>
-              </>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    No activity to display
+                  </p>
+                )}
+              </div>
             ),
           }}
         </Tabs>

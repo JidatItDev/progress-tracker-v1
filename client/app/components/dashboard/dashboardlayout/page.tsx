@@ -2,7 +2,6 @@
 
 import Sidebar from "../sidebar/page";
 import Topbar from "../topbar/page";
-import { useAuthStore } from "@/app/store/useAuthStore";
 import {
   Home,
   Files,
@@ -14,7 +13,7 @@ import {
   Milestone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const ALL_SIDEBAR_ITEMS = [
   {
@@ -67,22 +66,54 @@ const ALL_SIDEBAR_ITEMS = [
   },
 ] as const;
 
+interface User {
+  name: string;
+  role: string;
+  email?: string;
+  permissions?: {
+    [resource: string]: {
+      view?: boolean;
+      create?: boolean;
+      update?: boolean;
+      delete?: boolean;
+    };
+  };
+}
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const user = useAuthStore((s) => s.user);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // 🚨 HARD GUARD
+  // Auth guard - check localStorage for user
   useEffect(() => {
-    if (!user) {
-      router.replace("/login");
-    }
-  }, [user, router]);
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
-  if (!user) return null;
+    if (!token || !storedUser) {
+      router.replace("/login");
+      return;
+    }
+
+    try {
+      const parsedUser = JSON.parse(storedUser) as User;
+      setUser(parsedUser);
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.replace("/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  // Show nothing while checking auth
+  if (loading || !user) return null;
 
   const sidebarItems = ALL_SIDEBAR_ITEMS.filter((item) => {
     // Admin sees everything
@@ -91,11 +122,10 @@ export default function DashboardLayout({
     if (!item.permission) return false;
 
     const [resource, action] = item.permission.split(".");
-return Boolean(
-  user.permissions?.[resource as keyof typeof user.permissions]?.[
-    action as "view" | "create" | "update" | "delete"
-  ]
-);  });
+    return Boolean(
+      user.permissions?.[resource]?.[action as "view" | "create" | "update" | "delete"]
+    );
+  });
 
   return (
     <div className="flex h-screen">

@@ -1,12 +1,11 @@
 "use client";
 
-import { JSX, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/app/store/useAuthStore";
+import axios from "axios";
 
-export default function LoginPage(): JSX.Element {
+export default function LoginPage() {
   const router = useRouter();
-  const setAuth = useAuthStore((s) => s.setAuth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,65 +18,32 @@ export default function LoginPage(): JSX.Element {
     setError("");
 
     try {
-      const mockUsers = {
-        "admin@jidat.com": {
-          id: "1",
-          name: "Admin User",
-          role: "admin",
-          permissions: {
-            overview: { view: true },
-            projects: { view: true, create: true, delete: true },
-            milestones: { view: true, create: true, delete: true },
-            clients: { view: true, create: true },
-            activity: { view: true },
-            users: { view: true, create: true },
-            admin: { view: true },
-          },
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/login`,
+        {
+          email,
+          password,
         },
-
-        "client@jidat.com": {
-          id: "2",
-          name: "Client User",
-          role: "client",
-          permissions: {
-            overview: { view: true },
-            projects: { view: true },
-            milestones: { view: true },
-            activity: { view: true },
+        {
+          headers: {
+            "Content-Type": "application/json",
           },
-        },
+        }
+      );
 
-        "user@jidat.com": {
-          id: "3",
-          name: "Developer User",
-          role: "user",
-          permissions: {
-            overview: { view: true },
-            projects: { view: true },
-            milestones: { view: true },
-            activity: { view: false },
-          },
-        },
-      } as const;
+      const { user, token } = res.data;
 
-      const user = mockUsers[email as keyof typeof mockUsers];
+      // Store user and token in localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      if (!user || password !== `${user.role}123`) {
-        throw new Error("Invalid credentials");
-      }
-
-
-
-
-      setAuth({
-        user,
-        token: "mock-jwt-token",
-      });
-
+      // Redirect to home page
       router.replace("/pages/home");
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message || "Invalid email or password"
+        );
       } else {
         setError("Something went wrong");
       }
@@ -88,51 +54,38 @@ export default function LoginPage(): JSX.Element {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg grid grid-cols-1 md:grid-cols-2 overflow-hidden">
-        {/* Left */}
-        <div className="bg-gray-100 p-6 flex items-start">
-          <h1 className="text-3xl font-semibold text-gray-900">
-            Welcome to <br />
-            <span className="font-medium">Jidat IT Progress Tracker</span>
-          </h1>
-        </div>
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow">
+        <h1 className="text-2xl font-semibold mb-6">Login</h1>
 
-        {/* Right */}
-        <div className="p-10">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="text-red-600 text-sm font-medium">{error}</div>
-            )}
+        {error && <p className="text-red-600 mb-4 text-sm">{error}</p>}
 
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 p-3 text-base rounded-md focus:ring-2 focus:ring-pink-500 outline-none"
-              required
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border p-3 rounded"
+            required
+          />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 p-3 text-base rounded-md focus:ring-2 focus:ring-pink-500 outline-none"
-              required
-            />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border p-3 rounded"
+            required
+          />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-pink-600 text-white py-3 rounded-md font-semibold hover:bg-pink-700 transition disabled:opacity-60"
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-
-           
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-pink-600 text-white py-2 rounded disabled:opacity-60"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
       </div>
     </div>
   );
