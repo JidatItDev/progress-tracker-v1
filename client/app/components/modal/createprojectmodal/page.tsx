@@ -88,12 +88,15 @@ const CreateProjectModal = ({ onClose }: CreateProjectModalProps) => {
       const projectData = {
         userId: userId,
         projectName: projectTitle,
+        client: clientName, // FIX: Added the missing 'client' field
         description: description,
         startDate: startDate,
         endDate: endDate,
         priority: priority,
-        teamMembers: teamMembers, // Already contains member IDs
+        teamMembers: teamMembers,
       };
+
+      console.log("📤 Sending to API:", projectData); // Debug log
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/createProject`,

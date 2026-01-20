@@ -5,9 +5,12 @@ import { toast } from "react-toastify";
 
 interface DelayModalProps {
   onClose: () => void;
+  milestoneId: string;
+  projectId: string;
 }
 
-const DelayModal = ({ onClose }: DelayModalProps) => {
+
+const DelayModal = ({ onClose, milestoneId, projectId }: DelayModalProps) => {
   const [delayReason, setDelayReason] = useState("");
   const [delayDays, setDelayDays] = useState("");
 

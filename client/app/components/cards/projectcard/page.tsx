@@ -67,7 +67,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const daysRemaining = getDaysRemaining();
 
   return (
-    <div className="bg-white w-55 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white w-65 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-gray-900 font-light mb-1 text-sm whitespace-nowrap">

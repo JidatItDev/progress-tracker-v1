@@ -70,36 +70,55 @@ const activityData = [
   },
 ];
 
-function TeamAvatars({ team }: { team?: any[] }) {
-  const getInitial = (member: any) => {
+type TeamMember =
+  | string
+  | number
+  | null
+  | undefined
+  | { name?: string; username?: string; email?: string };
+
+function TeamAvatars({ team }: { team?: TeamMember[] }) {
+  const getInitial = (member: TeamMember) => {
     try {
       // If member is a string
       if (typeof member === "string") {
         return member.charAt(0).toUpperCase();
       }
+
+      // If member is a number
+      if (typeof member === "number") {
+        return String(member).charAt(0).toUpperCase();
+      }
+
       // If member is an object with a name property
-      if (typeof member === "object" && member !== null) {
+      if (member && typeof member === "object") {
         const name = member.name || member.username || member.email || "";
         if (name) return name.charAt(0).toUpperCase();
       }
-      // If member is a number or other type
-      const stringValue = String(member || "?");
-      return stringValue.charAt(0).toUpperCase();
-    } catch (error) {
+
+      // Fallback
+      return "?";
+    } catch {
       return "?";
     }
   };
 
-  const getMemberName = (member: any, index: number) => {
+  const getMemberName = (member: TeamMember, index: number) => {
     try {
       if (typeof member === "string") return member;
-      if (typeof member === "object" && member !== null) {
+      if (typeof member === "number") return String(member);
+
+      if (member && typeof member === "object") {
         return (
-          member.name || member.username || member.email || `Member ${index + 1}`
+          member.name ||
+          member.username ||
+          member.email ||
+          `Member ${index + 1}`
         );
       }
+
       return `Member ${index + 1}`;
-    } catch (error) {
+    } catch {
       return `Member ${index + 1}`;
     }
   };
@@ -169,15 +188,12 @@ export default function Home() {
         }
       );
 
-      // Assuming the API returns projects in response.data or response.data.projects
       const projects = response.data.projects || response.data;
       setProjectData(projects);
     } catch (err) {
       console.error("Error fetching projects:", err);
       if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.message || "Failed to fetch projects"
-        );
+        setError(err.response?.data?.message || "Failed to fetch projects");
       } else {
         setError("An unexpected error occurred");
       }
@@ -190,10 +206,9 @@ export default function Home() {
     fetchProjects();
   }, []);
 
-  // Handle modal close
   const handleModalClose = () => {
     setIsModalOpen(false);
-    fetchProjects(); // Refresh the project list
+    fetchProjects();
   };
 
   const activitySection = (
@@ -212,7 +227,9 @@ export default function Home() {
             <h1 className="text-xl font-bold text-gray-50">
               Project Dashboard
             </h1>
-            <p className="text-gray-100 text-sm">Monitor and manage your projects</p>
+            <p className="text-gray-100 text-sm">
+              Monitor and manage your projects
+            </p>
 
             <div className="gap-4 mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               {statsData.map((item, index) => (
@@ -314,21 +331,18 @@ export default function Home() {
             </div>
           )}
 
-          {/* Loading State */}
           {loading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-500">Loading projects...</div>
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
             </div>
           )}
 
-          {/* Error State */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
             </div>
           )}
 
-          {/* Projects Display */}
           {!loading && !error && view === "grid" ? (
             <div className="flex gap-6">
               <div className="w-3/4">
@@ -372,15 +386,25 @@ export default function Home() {
                             key={project._id}
                             className="hover:bg-gray-50 transition text-xs text-gray-500"
                           >
-                            <td className="px-2 py-3 font-medium">{project.projectName || 'N/A'}</td>
-                            <td className="px-2 py-3">{project.userId?.name || 'N/A'}</td>
-                            <td className="px-2 py-3 capitalize">{project.projectStatus || 'N/A'}</td>
-                            <td className="px-2 py-3">{project.priority || 'N/A'}</td>
+                            <td className="px-2 py-3 font-medium">
+                              {project.projectName || "N/A"}
+                            </td>
                             <td className="px-2 py-3">
-                              <TeamAvatars team={project.teamMembers} />
+                              {project.userId?.name || "N/A"}
+                            </td>
+                            <td className="px-2 py-3 capitalize">
+                              {project.projectStatus || "N/A"}
+                            </td>
+                            <td className="px-2 py-3">
+                              {project.priority || "N/A"}
+                            </td>
+                            <td className="px-2 py-3">
+                              <TeamAvatars team={project.teamMembers as TeamMember[] | undefined} />
                             </td>
                             <td className="px-4 py-3">
-                              {project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : 'N/A'}
+                              {project.updatedAt
+                                ? new Date(project.updatedAt).toLocaleDateString()
+                                : "N/A"}
                             </td>
                           </tr>
                         ))}
@@ -398,7 +422,6 @@ export default function Home() {
         </div>
       </DashboardLayout>
 
-      {/* Modal - Rendered outside DashboardLayout */}
       {isModalOpen && <CreateProjectModal onClose={handleModalClose} />}
     </>
   );
