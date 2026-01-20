@@ -121,7 +121,7 @@ async createProject(data: projectData): Promise<any> {
         endDate: savedProject.endDate,
         priority: savedProject.priority,
 
-        // ✅ added attributes
+        //  added attributes
         milestone: totalMilestones,
         completion,
 
@@ -151,7 +151,7 @@ async updateProject(data: projectData): Promise<any> {
       projectId,
       userId,
       projectName,
-      client, // ✅ NEW
+      client, //  NEW
       description,
       startDate,
       endDate,
@@ -193,7 +193,7 @@ async updateProject(data: projectData): Promise<any> {
       updates.projectName = cleanProjectName;
     }
 
-    // ✅ NEW: update client
+    //  NEW: update client
     if (client !== undefined) {
       const cleanClient = String(client).trim();
       if (!cleanClient) {
@@ -280,7 +280,7 @@ async updateProject(data: projectData): Promise<any> {
       project: {
         id: updatedProject._id,
         projectName: updatedProject.projectName,
-        client: updatedProject.client, // ✅ RETURN
+        client: updatedProject.client, //  RETURN
         description: updatedProject.description,
         startDate: updatedProject.startDate,
         endDate: updatedProject.endDate,

@@ -37,9 +37,9 @@ const Projects = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
-      console.log(response,"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+      console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
 
       const projects = response.data.projects || response.data;
       setProjectData(projects);
@@ -95,7 +95,7 @@ const Projects = () => {
 
         {/* Loading State */}
         {loading && (
-           <div className="flex justify-center items-center py-12">
+          <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
           </div>
         )}

@@ -287,6 +287,7 @@ async deleteMilestone(milestoneId: string): Promise<any> {
   }
 }
 
+
 async getMilestones(query: any): Promise<any> {
   try {
     // -------- 1) Pagination --------
@@ -317,10 +318,21 @@ async getMilestones(query: any): Promise<any> {
         .limit(limit)
         .populate({
           path: "projectId",
-          select: "projectName startDate endDate priority status",
-          populate: { path: "userId", select: "name email role" }, // project creator
+          select: "projectName startDate endDate priority status teamMembers userId",
+          populate: [
+            {
+              path: "userId",
+              select: "name email role",
+            },
+            {
+              path: "teamMembers",
+              model: "Users",
+              select: "name email role",
+            },
+          ],
         })
         .lean(),
+
       Milestones.countDocuments(filter),
     ]);
 
