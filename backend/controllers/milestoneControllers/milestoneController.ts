@@ -20,7 +20,7 @@ export const createMilestoneController = async (
           errors.array().map((e: any) => e.msg).join(", "),
         400
       );
-    }
+}
 
     const { projectId, milestoneName, description, startDate, endDate } = req.body;
 

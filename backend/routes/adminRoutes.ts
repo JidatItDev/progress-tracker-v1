@@ -57,7 +57,7 @@ export default (app: Application): void => {
 
     app.post('/admin/createProject', authenticateToken, checkPermission("projects", "create"), createProjectController);
 
-    app.put('/admin/updateProject/:id', authenticateToken, checkPermission("projects", "udpate"), updateProjectController);
+    app.put('/admin/updateProject/:id', authenticateToken, checkPermission("projects", "update"), updateProjectController);
 
     app.patch('/admin/deleteProject/:id', authenticateToken, checkPermission("projects", "delete"), deleteProjectController);
 
@@ -82,7 +82,7 @@ export default (app: Application): void => {
 
     app.patch('/admin/deleteSubMilestone/:id', authenticateToken, checkPermission("submilestones", "delete"), deleteSubMilestoneController);
 
-    app.get('/admim/getSubMilestones', authenticateToken, checkPermission("submilestones", "view"), getSubMilestonesController);
+    app.get('/admin/getSubMilestones', authenticateToken, checkPermission("submilestones", "view"), getSubMilestonesController);
 
     //delay routes:
     app.post('/admin/createDelay', authenticateToken, checkPermission("delay", "create"), createDelayController);
