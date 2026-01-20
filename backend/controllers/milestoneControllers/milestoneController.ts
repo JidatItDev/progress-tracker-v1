@@ -139,4 +139,49 @@ export const getMilestonesController = async (
   }
 };
 
+export const getMilestonesByIdController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // -----------------------------
+    // express-validator check
+    // -----------------------------
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new AppError(
+        "Validation failed: " +
+          errors.array().map((e: any) => e.msg).join(", "),
+        400
+      );
+    }
 
+    // -----------------------------
+    // Extract milestoneId
+    // -----------------------------
+    const milestoneId = req.params.id || req.query.id;
+
+    // -----------------------------
+    // Call service
+    // -----------------------------
+    const result =
+      await milestoneServiceInstance.getMilestonesbyId({
+        milestoneId,
+      });
+
+    // -----------------------------
+    // Handle service error
+    // -----------------------------
+    if (!result.success) {
+      return res.status(result.error.status).json(result);
+    }
+
+    // -----------------------------
+    // Success response
+    // -----------------------------
+    return res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};

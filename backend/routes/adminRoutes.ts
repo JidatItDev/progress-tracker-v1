@@ -5,7 +5,7 @@ import { loginValidation, updateUserProfileValidation } from "../middlewares/aut
 import { authenticateToken } from "../middlewares/authMiddleware";
 import { authorize } from "../abac/authorize";
 import { createProjectController, deleteProjectController, getProjectsController, updateProjectController } from "../controllers/projectControllers/projectController";
-import { createMilestoneController, deleteMilestoneController, getMilestonesController, updateMilestoneController } from "../controllers/milestoneControllers/milestoneController";
+import { createMilestoneController, deleteMilestoneController, getMilestonesByIdController, getMilestonesController, updateMilestoneController } from "../controllers/milestoneControllers/milestoneController";
 import { createSubMilestoneController, deleteSubMilestoneController, getSubMilestonesController, updateSubMilestoneController } from "../controllers/subsmilestoneControllers/submilestoneController";
 import { createDelayController, deleteDelayController, getDelaysByMilstoneIdController, updateDelayController } from "../controllers/delayControllers/delayController";
 import { getProjectProgressController } from "../controllers/projectDashboardControllers/progressTrackerController";
@@ -72,6 +72,8 @@ export default (app: Application): void => {
     app.patch('/admin/deleteMilestone/:id', authenticateToken, checkPermission("milestones", "delete"), deleteMilestoneController);
 
     app.get('/admin/getMilestones', authenticateToken, checkPermission("milestones", "view"), getMilestonesController);
+
+    app.get('/admin/getMilestonesById/:id', authenticateToken, checkPermission("milestones", "view"), getMilestonesByIdController);
 
     //submileston routes:
     app.post('/admin/createSubMilestone', authenticateToken, checkPermission("submilestones", "create"), createSubMilestoneController);

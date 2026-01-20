@@ -5,6 +5,7 @@ import Users from "../../models/userModel";
 import { handleError } from "../../utils/errorHandler";
 import Milestones from "../../models/milestoneModel";
 import { milestoneData, MilestoneStatus } from "./milestone.interface";
+import SubMilestones from "../../models/submilestoneModel";
 
 
 export class milestoneService {
@@ -347,6 +348,61 @@ async getMilestones(query: any): Promise<any> {
     };
   } catch (err) {
     return handleError(err as AppError);
+  }
+}
+
+async getMilestonesbyId(query: any): Promise<any> {
+  try {
+    // -------- 1) Validate milestoneId --------
+    const milestoneId = query.id || query.milestoneId;
+
+    if (!milestoneId) {
+      throw new AppError("milestoneId is required.", 400);
+    }
+
+    // -------- 2) Fetch milestone --------
+    const milestone = await Milestones.findOne({
+      _id: milestoneId,
+      status: "Y",
+    })
+      .populate({
+        path: "projectId",
+        select: "projectName startDate endDate priority status teamMembers userId",
+        populate: [
+          {
+            path: "userId",
+            select: "name email role",
+          },
+          {
+            path: "teamMembers",
+            model: "Users",
+            select: "name email role",
+          },
+        ],
+      })
+      .lean();
+
+    if (!milestone) {
+      throw new AppError("Milestone not found.", 404);
+    }
+
+    // -------- 3) Fetch sub-milestones --------
+    const subMilestones = await SubMilestones.find({
+      milestoneId: milestone._id,
+      status: "Y",
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // -------- 4) Return --------
+    return {
+      success: true,
+      message: "Milestone retrieved successfully.",
+      milestone,
+      subMilestones,
+    };
+  } catch (error) {
+    return handleError(error as AppError);
   }
 }
 }
