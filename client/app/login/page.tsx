@@ -65,7 +65,7 @@ export default function LoginPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 text-base rounded"
             required
           />
 
@@ -74,14 +74,14 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 text-base rounded"
             required
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-pink-600 text-white py-2 rounded disabled:opacity-60"
+            className="w-full bg-pink-600 text-white py-2 text-base rounded disabled:opacity-60"
           >
             {loading ? "Logging in..." : "Login"}
           </button>

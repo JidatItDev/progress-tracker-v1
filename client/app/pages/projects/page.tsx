@@ -37,9 +37,9 @@ const Projects = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
-      console.log(response,"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+      console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
 
       const projects = response.data.projects || response.data;
       setProjectData(projects);
@@ -73,7 +73,6 @@ const Projects = () => {
 
   return (
     <>
-      {/*  ToastContainer lives on THIS page */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -96,8 +95,8 @@ const Projects = () => {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500">Loading projects...</div>
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
           </div>
         )}
 
@@ -110,7 +109,7 @@ const Projects = () => {
 
         {/* Projects grid */}
         {!loading && !error && (
-          <div className="flex flex-wrap gap-6 mt-6">
+          <div className="flex flex-wrap gap-6 mt-6  rounded-lg justify-center p-5">
             {projectData.length === 0 ? (
               <div className="text-center w-full py-12 text-gray-500">
                 No projects found. Create your first project!
