@@ -75,7 +75,7 @@ export default (app: Application): void => {
 
     app.get('/admin/getMilestonesById/:id', authenticateToken, checkPermission("milestones", "view"), getMilestonesByIdController);
 
-    //submileston routes:
+    //submilestone routes:
     app.post('/admin/createSubMilestone', authenticateToken, checkPermission("submilestones", "create"), createSubMilestoneController);
 
     app.put('/admin/updateSubMilestone/:id', authenticateToken, checkPermission("submilestones", "update"), updateSubMilestoneController);
